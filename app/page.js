@@ -8,8 +8,7 @@ export default function Home() {
   const [query, setQuery] = useState("SELECT * FROM movies;");
   const [result, setResult] = useState([]);
   const [taskIndex, setTaskIndex] = useState(0);
-  const [showModal, setShowModal] = useState(false);
-  const [theme, setTheme] = useState("dark");
+  const [theme, setTheme] = useState("light");
 
   const tasks = [
     "SELECT title FROM movies;",
@@ -17,12 +16,15 @@ export default function Home() {
     "SELECT title, director FROM movies;",
     "SELECT title, year FROM movies;",
     "SELECT * FROM movies;",
-    "SELECT title FROM movies WHERE year > 1998;",
-    "SELECT director, COUNT(*) FROM movies GROUP BY director;",
-    "SELECT * FROM movies ORDER BY year DESC;",
-    "SELECT * FROM movies LIMIT 2;",
-    "SELECT title FROM movies WHERE director = 'John Lasseter';"
   ];
+
+  const questions = [
+    "Find the title of each film",
+    "Find the director of each film",
+    "Find the title and director of each film",
+    "Find the title and year of each film",
+    "Find all information about each film;"
+  ];  
 
   useEffect(() => {
     const saved = localStorage.getItem("theme");
@@ -57,16 +59,26 @@ export default function Home() {
         (1, 'Toy Story', 'John Lasseter', 1995, 81),
         (2, 'A Bug''s Life', 'John Lasseter', 1998, 95),
         (3, 'Toy Story 2', 'John Lasseter', 1999, 93),
-        (4, 'Monsters, Inc.', 'Pete Docter', 2001, 92);
+        (4, 'Monsters, Inc.', 'Pete Docter', 2001, 92),
+        (5, 'Finding Nemo', 'Andrew Stanton', 2003, 100),
+        (6, 'The Incredibles', 'Brad Bird', 2004, 115),
+        (7, 'Cars', 'John Lasseter', 2006, 117),
+        (8, 'Ratatouille', 'Brad Bird', 2007, 111),
+        (9, 'WALL-E', 'Andrew Stanton', 2008, 98),
+        (10, 'Up', 'Pete Docter', 2009, 96),
+        (11, 'Toy Story 3', 'Lee Unkrich', 2010, 103),
+        (12, 'Cars 2', 'John Lasseter', 2011, 120),
+        (13, 'Brave', 'Brenda Chapman', 2012, 102),
+        (14, 'Monsters University', 'Dan Scanlon', 2013, 110);
       `);
 
       setDb(database);
 
       // 🔥 auto run default query
-const res = database.exec("SELECT * FROM movies;");
-if (res.length > 0) {
-  setResult(res[0]);
-}
+      const res = database.exec("SELECT * FROM movies;");
+      if (res.length > 0) {
+        setResult(res[0]);
+      }
     };
 
     loadDB();
@@ -84,9 +96,6 @@ if (res.length > 0) {
         if (query.trim().toLowerCase() === tasks[taskIndex].toLowerCase()) {
           const next = taskIndex + 1;
           setTaskIndex(next);
-
-          // 🔥 auto next query set
-          setQuery(tasks[next] || "SELECT * FROM movies;");
 
           if (next === 5) setShowModal(true);
         }
@@ -182,7 +191,7 @@ if (res.length > 0) {
           <div className={`p-4 rounded-xl ${cardTheme}`}>
             <h2 className="mb-2 font-bold">Tasks</h2>
 
-            {tasks.map((task, i) => (
+            {questions.map((question, i) => (
               <div
                 key={i}
                 className={`p-2 text-sm ${
@@ -193,28 +202,13 @@ if (res.length > 0) {
                     : "text-gray-500"
                 }`}
               >
-                {i + 1}. {task}
+                {i + 1}. {question}
               </div>
             ))}
           </div>
 
         </div>
       </div>
-
-      {/* Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center">
-          <div className="p-6 bg-[#111827] rounded-xl text-center">
-            <h2 className="text-xl mb-2">Premium Unlock 🚀</h2>
-            <button
-              onClick={() => setShowModal(false)}
-              className="px-4 py-2 bg-blue-500 rounded"
-            >
-              Continue
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
