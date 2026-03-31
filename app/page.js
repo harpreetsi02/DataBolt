@@ -96,8 +96,6 @@ export default function Home() {
         if (query.trim().toLowerCase() === tasks[taskIndex].toLowerCase()) {
           const next = taskIndex + 1;
           setTaskIndex(next);
-
-          if (next === 5) setShowModal(true);
         }
       }
     } catch (err) {
@@ -189,7 +187,7 @@ export default function Home() {
 
           {/* RIGHT */}
           <div className={`p-4 rounded-xl ${cardTheme}`}>
-            <h2 className="mb-2 font-bold">Tasks</h2>
+            <h2 className="mb-2 text-xl font-bold">Exercise 1 - Tasks</h2>
 
             {questions.map((question, i) => (
               <div
