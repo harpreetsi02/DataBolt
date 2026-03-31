@@ -116,9 +116,17 @@ if (res.length > 0) {
           <button onClick={() => changeTheme("dark")} className="px-3 py-1 text-white font-bold bg-gray-500 rounded">Dark</button>
         </div>
 
-        {/* ✅ Responsive Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div>
+            <h1 className="text-2xl font-bold">What is SQL</h1>
+            <h2 className="mb-2 text-lg">SQL (Structured Query Language) is a standard language used to interact with databases. It allows you to store, retrieve, update, and manage data efficiently.
+            </h2>
 
+            <h1 className="text-2xl font-bold">What is Query</h1>
+            <h2 className="mb-2 text-lg">The SELECT query is used to fetch data from a database. For example, "SELECT * FROM movies;" retrieves all records from the movies table, helping you view and analyze the stored data.</h2>
+          </div>
+
+        {/* ✅ Responsive Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
           {/* LEFT */}
           <div className="md:col-span-2 space-y-4">
 
