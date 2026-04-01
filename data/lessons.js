@@ -1,0 +1,32 @@
+export const lessons = [
+  { id: 1, title: "What is SQL?" },
+  { id: 2, title: "Your Sample Database" },
+  { id: 3, title: "SELECT — Reading data" },
+  { id: 4, title: "WHERE — Filtering rows" },
+  { id: 5, title: "AND, OR, NOT" },
+  { id: 6, title: "BETWEEN, IN, LIKE" },
+  { id: 7, title: "NULL — The Mystery Value" },
+  { id: 8, title: "ORDER BY" },
+  { id: 9, title: "LIMIT & OFFSET" },
+
+  { id: 10, title: "Aggregate Functions" },
+  { id: 11, title: "GROUP BY" },
+  { id: 12, title: "HAVING" },
+  { id: 13, title: "JOINs" },
+  { id: 14, title: "Joining Multiple Tables" },
+  { id: 15, title: "Subqueries" },
+  { id: 16, title: "CTEs (WITH)" },
+  { id: 17, title: "CASE Statements" },
+
+  { id: 18, title: "Window Functions" },
+  { id: 19, title: "String Functions" },
+  { id: 20, title: "Date & Time Functions" },
+  { id: 21, title: "INSERT, UPDATE, DELETE" },
+  { id: 22, title: "CREATE TABLE & DDL" },
+  { id: 23, title: "Indexes & Performance" },
+  { id: 24, title: "Transactions & ACID" },
+  { id: 25, title: "SQL Execution Order" },
+
+  { id: 26, title: "50 Practice Problems" },
+  { id: 27, title: "Answer Key" },
+];
