@@ -1,3 +1,5 @@
+import { dbTables } from "./dbTables";
+
 export const lessonContent = {
   1: {
     title: "What is",
@@ -93,75 +95,31 @@ LIMIT 20;`,
       {
         type: "table",
         title: "employees",
-        headers: ["emp_id", "name", "department", "salary", "manager_id", "hire_date"],
-        rows: [
-          ["1", "Arjun", "IT", "85000", null, "2020-06-15"],
-          ["2", "Priya", "Marketing", "72000", 1, "2019-03-20"],
-          ["3", "Rahul", "IT", "80000", 1, "2021-01-10"],
-          ["4", "Sneha", "HR", "65000", null, "2018-11-05"],
-          ["5", "Vikram", "Marketing", "70000", 2, "2020-02-25"],
-          ["6", "Ananya", "IT", "78000", 1, "2021-07-01"],
-          ["7", "Kavya", "HR", "62000", 4, "2019-08-12"],
-          ["8", "Rohan", "IT", "77000", 1, "2022-03-15"]
-        ]
+        data: dbTables.employees
       },
 
       {
         type: "table",
         title: "products",
-        headers: ["product_id", "name", "category", "price", "stock"],
-        rows: [
-          ["1", "iPhone", "Electronics", "79999", "50"],
-          ["2", "SQL Book", "Books", "499", "200"],
-          ["3", "Headphones", "Electronics", "2999", "75"],
-          ["4", "Notebook", "Stationery", "99", "500"],
-          ["5", "Laptop", "Electronics", "65000", "20"],
-          ["6", "Pen Set", "Stationery", "149", "0"],
-        ]
+        data: dbTables.products
       },
 
       {
         type: "table",
         title: "customers",
-        headers: ["customer_id", "name", "city", "country"],
-        rows: [
-          ["1", "Ananya", "Hyderabad", "India"],
-          ["2", "Rohan", "Bangalore", "India"],
-          ["3", "Sam", "Mumbai", "India"],
-          ["4", "Lisa", "London", "UK"],
-          ["5", "Ravi", "Delhi", "India"],
-        ]
+        data: dbTables.customers
       },
 
       {
         type: "table",
         title: "orders",
-        headers: ["order_id", "customer_id", "order_date", "total", "status"],
-        rows: [
-          ["1", "1", "2024-01-15", "79999", "completed"],
-          ["2", "2", "2024-01-20", "3498", "completed"],
-          ["3", "1", "2024-02-10", "65000", "completed"],
-          ["4", "3", "2024-02-14", "499", "pending"],
-          ["5", "2", "2024-03-01", "248", "completed"],
-          ["6", "5", "2024-03-15", "2999", "shipped"],
-          ["7", "1", "2024-04-05", "149", "completed"],
-        ]
+        data: dbTables.orders
       },
 
       {
         type: "table",
         title: "orders_items",
-        headers: ["item_id", "order_id", "product_id", "qty", "unit_price"],
-        rows: [
-          ["1", "1", "1", "1", "79999"],
-          ["2", "2", "3", "1", "2999"],
-          ["3", "2", "2", "1", "499"],
-          ["4", "3", "5", "1", "65000"],
-          ["5", "4", "2", "1", "499"],
-          ["6", "5", "4", "2", "99"],
-          ["7", "5", "6", "1", "50"],
-          ["8", "6", "3", "1", "2999"],
-        ]
+        data: dbTables.order_items
       },
 
       {
@@ -198,7 +156,27 @@ LIMIT 20;`,
       ],
 
       blocks: [
+        {
 
+        },
+        {
+          type: "exercise",
+          exersiceName: "Table: Employees",
+          tasks: [
+            "SELECT name FROM employees;",
+            "SELECT department FROM employees;",
+            "SELECT name, department FROM employees;",
+            "SELECT name, salary FROM employees;",
+            "SELECT * FROM employees;"
+          ],
+          questions: [
+            "Find all employee names",
+            "Find all departments",
+            "Find name and department",
+            "Find name and salary",
+            "Show all data"
+          ],
+        }
       ]
     }
 };
