@@ -33,7 +33,7 @@ export default function NextLessonButton({ currentId, lesson }) {
   };
 
   return (
-    <div className="mt-10 flex justify-end">
+    <div className="mt-10 flex justify-center">
 
       <button
         onClick={nextLesson}
