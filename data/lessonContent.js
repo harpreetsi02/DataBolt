@@ -143,7 +143,8 @@ LIMIT 20;`,
   },
 
   3: {
-      highlight: "SELECT",
+      title: "SELECT",
+      highlight: "Query",
       subtitle: "Reading data — every SQL journey starts here.",
       hasExercise: false,
 
@@ -157,8 +158,26 @@ LIMIT 20;`,
 
       blocks: [
         {
-
+          type: "queryTable",
+          title: "3.1 - Select Specific Columns",
+          subtitle: "You almost never want every column. Pick what you need.",
+          queryName: "SQL",
+          code: `SELECT name, salary 
+FROM employees;`,
+          data: dbTables.employees
         },
+
+        {
+          type: "queryTable",
+          title: "3.2 - Column Aliases with AS",
+          queryName: "SQL",
+          code: `SELECT name AS 'Employee',
+        salary AS 'Monthly Salary',
+        salary * 12 AS 'Annual CTC'
+FROM employees;`,
+          data: dbTables.employees
+        },
+        
         {
           type: "exercise",
           exersiceName: "Table: Employees",
@@ -178,5 +197,171 @@ LIMIT 20;`,
           ],
         }
       ]
+    },
+
+    4: {
+      title: "FILTERING -",
+      highlight: "WHERE",
+      subtitle: "WHERE filters which rows come back. Without it, you get every row.",
+      hasExercise: false,
+
+      points: [
+        "Filtering rows with a single condition",
+        "All comparison operators: =, !=, >, <, >=, <=",
+        "Filtering numbers, text, and dates"
+      ],
+
+      blocks: [
+        {
+          type: "noteGreen",
+          heading: "Think of it this way:",
+          explanation: `WHERE is the bouncer at the door. Only rows that satisfy the condition get through to your result. Everyone else it turned away.`,
+        },
+
+        {
+          type: "queryTable",
+          title: "4.1 - Basic Syntax",
+          queryName: "SQL",
+          code: `SELECT name, department, salary 
+FROM employees
+WHERE department = 'IT';`,
+          data: dbTables.employees
+        },
+
+        {
+        type: "summaryTable",
+        title: "4.2 -All Comparison Operators",
+        headers: ["OPERATOR", "MEANING", "EXAMPLE"],
+        rows: [
+          ["=", "Exact equal", "department = 'IT'"],
+          ["!= or <>", "Not equal", `status != 'completed'`],
+          [">", "Greater than", "salary > 70000"],
+          ["<", "Less than", `salary < 60000`],
+          [">=", "Greater than or equal", `slalary >= 72000`],
+          ["<=", "Less than or equal", `salary <= 62000`]
+          ]
+        },  
+        {
+          type: "queryTable",
+          queryName: "Find employees more than 70000",
+          code: `SELECT name, salary 
+FROM employees
+WHERE salary > 70000;`,
+          data: dbTables.employees
+        },
+
+        {
+          type: "exercise",
+          exersiceName: "Table: Employees",
+          tasks: [
+            "SELECT * FROM employees WHERE department = 'IT';",
+            "SELECT * FROM employees WHERE salary > 60000;",
+            "SELECT * FROM employees WHERE department = 'IT' AND salary > 60000;",
+            "SELECT * FROM employees WHERE department = 'HR' OR department = 'Marketing';",
+            "SELECT * FROM employees WHERE manager_id IS NULL;"
+          ],
+          questions: [
+            "Find all employees who work in the IT department",
+            "Find employees with salary greater than 60000.",
+            "Find employees who work in IT and earn more than 60000.",
+            "Find employees who are in HR or Marketing.",
+            "Find employees who do not have a manager."
+          ],
+        }
+      ],
+    },
+
+    5: {
+      title: "AND, OR,",
+      highlight: "NOT",
+      subtitle: "Combining multiple conditions into one filter.",
+      hasExercise: false,
+
+      points: [
+        "AND: both conditions must be true",
+        "OR: at least one condition must be true",
+        "NOT: invert a condition",
+        "Parentheses to control evaluation order"
+      ],
+
+      blocks: [
+        {
+          type: "queryTable",
+          queryName: "IT employees earning > 70,000",
+          code: `SELECT name, department, salary 
+FROM employees
+WHERE department = 'IT' AND salary > 70000;`,
+          data: dbTables.employees
+        },
+
+        {
+          type: "queryTable",
+          queryName: "IT or HR employees",
+          code: `SELECT name, department 
+FROM employees
+WHERE department = 'IT' OR department = 'HR';`,
+          data: dbTables.employees
+        },
+
+        {
+          type: "query",
+          heading: "5.3 - NOT",
+          subtitle: "Everyone except Salses",
+          code: `SELECT name, department 
+FROM employees
+WHERE NOT department = 'Sales';`,
+        },
+
+        {
+          type: "queryTable",
+          title: "5.4 - Parentheses - Always Be Explicit",
+          subtitle: "❌ Common Mistake: AND has higher precedence than OR, just like multiplication vs addition in maths. WHERE a OR b AND c is evaluated as WHERE a OR (b AND c), which is almost never what you intended. Always use parentheses",
+          queryName: "Sales employees, OR IT employees earning > 80,000",
+          code: `SELECT name, department, salary 
+FROM employees
+WHERE department = 'Sales'
+      OR (department = 'IT' AND salary > 80000);`,
+          data: dbTables.employees
+        },
+
+        {
+          type: "exercise",
+          exersiceName: "Table: Employees",
+          tasks: [
+            "SELECT name, department, salary FROM employees WHERE department = 'IT' AND salary > 70000;",
+            "SELECT name, department FROM employees WHERE department = 'HR' OR department = 'Sales';",
+            "SELECT name, salary, department FROM employees WHERE salary < 60000 OR department = 'IT';",
+            "SELECT name, department FROM employees WHERE NOT department = 'Sales';",
+            "SELECT name, manager_id FROM employees WHERE manager_id IS NOT NULL;",
+            "SELECT name, department, salary FROM employees WHERE (department = 'IT' OR department = 'HR') AND salary > 60000 AND NOT department = 'Sales';"
+          ],
+          questions: [
+            "Find employees who are in IT and have salary greater than 70000.",
+            "Find employees who are in HR or Sales.",
+            "Find employees who have salary less than 60000 or work in IT.",
+            "Find employees who are not in Sales department.",
+            "Find employees who do have a manager (i.e., manager_id is NOT NULL)",
+            "Find employees who: are in IT or HR, and salary greater than 60000, and not in Sales",
+          ],
+        }
+      ],
+    },
+
+    6: {
+      title: "IN, BETWEEN,",
+      highlight: "LIKE",
+      subtitle: "More advanced filtering tools for specific scenarios.",
+      hasExercise: false,
+
+      points: [
+        "IN: filter by a list of values",
+        "BETWEEN: filter by a range of values",
+        "LIKE: filter by pattern matching with wildcards"
+      ],
+
+      blocks: [
+        
+      ]
     }
+
 };

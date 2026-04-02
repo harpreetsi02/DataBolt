@@ -9,6 +9,14 @@ export default function SqlEditor({ tasks = [], questions = [], lessonId, exerci
   const [taskIndex, setTaskIndex] = useState(0);
   const defaultQuery = "SELECT * FROM employees;";
 
+  const normalizeQuery = (q) => {
+    return q
+      .replace(/\s+/g, " ")
+      .replace(/\n/g, " ")
+      .trim()
+      .toLowerCase();
+  };
+
     const showSolution = () => {
             if (tasks[taskIndex]) {
             setQuery(tasks[taskIndex]);
@@ -35,7 +43,7 @@ export default function SqlEditor({ tasks = [], questions = [], lessonId, exerci
         // ✅ task check
         if (
           tasks[taskIndex] &&
-          q.trim().toLowerCase() === tasks[taskIndex].toLowerCase()
+          normalizeQuery(q) === normalizeQuery(tasks[taskIndex])
         ) {
           setTaskIndex(taskIndex + 1);
         }
@@ -139,7 +147,7 @@ export default function SqlEditor({ tasks = [], questions = [], lessonId, exerci
           
         ))}
       </div>
-      <div className="mt-4 text-sm text-gray-400">
+      <div className="mt-4 text-sm text-center text-gray-400">
         Stuck? Read this task's{" "}
         <button
           onClick={showSolution}

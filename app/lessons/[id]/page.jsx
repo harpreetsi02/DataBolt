@@ -2,6 +2,7 @@ import { lessons } from "@/data/lessons";
 import { lessonContent } from "@/data/lessonContent";
 import SqlEditor from "@/components/SqlEditor";
 import NextLessonButton from "@/components/NextLessonButton";
+import QueryTable from "@/components/QueryTable";
 
 export default async function LessonPage({ params }) {
   const { id } = await params;
@@ -16,7 +17,7 @@ export default async function LessonPage({ params }) {
     <div className="min-h-screen bg-black text-white px-4 md:px-10 py-10">
 
         {/* CHAPTER TITLE */}
-        <div className="max-w-4xl md:max-w-5xl bg-gray-900/60 border-t-4 rounded-xl border-red-500 p-4 mx-auto">
+        <div className="max-w-4xl md:max-w-5xl relative bg-gray-900/60 border-t-4 rounded-xl border-red-500 p-4 mx-auto">
 
             <p className="text-sm font-bold text-red-500 mb-2">CHAPTER {id}</p>
 
@@ -66,6 +67,33 @@ export default async function LessonPage({ params }) {
                             </p>
                         </div>
                     );
+                }
+
+                if (block.type === "queryTable") {
+                  return (
+                    <div key={i} className="mb-8">
+                      <h2 className="text-xl font-semibold text-red-500 mb-3">
+                        {block.title}
+                      </h2>
+                
+                      <p className="text-gray-300 mb-4">
+                        {block.subtitle}
+                      </p>
+                
+                      <p className="text-red-500 flex items-center gap-2">
+                        <i className="ri-send-plane-2-fill"></i>
+                        {block.queryName}
+                      </p>
+                
+                      {/* CODE */}
+                      <div className="bg-gray-900 w-4/5 ml-5 mb-10 text-gray-400 p-4 rounded-lg overflow-x-auto text-sm">
+                        <pre>{block.code}</pre>
+                      </div>
+                
+                      {/* ✅ RESULT TABLE */}
+                      <QueryTable query={block.code} />
+                    </div>
+                  );
                 }
 
                 // TABLE
@@ -120,7 +148,7 @@ export default async function LessonPage({ params }) {
                               
                               <tbody>
                                 {block.rows.map((row, j) => (
-                                  <tr key={j} className="odd:bg-gray-800">
+                                  <tr key={j} className="odd:bg-gray-800 text-center">
                                     {row.map((cell, k) => (
                                       <td key={k} className="px-2.5 py-2 border">{cell}</td>
                                     ))}
@@ -136,9 +164,10 @@ export default async function LessonPage({ params }) {
                 if (block.type === "exercise") {
                     return (
                         <div key={i} className="mt-6">
-                          
-                            <h3 className="font-bold mb-2">
-                                {/* {block.questions} */}
+                            <h2 className="text-xl absolute right-5 font-bold top-5 text-red-500">Exercise 👇</h2>
+
+                            <h3 className="font-bold mb-2 text-xl text-red-500">
+                                Exercise:
                             </h3>
 
                             <SqlEditor
@@ -154,7 +183,17 @@ export default async function LessonPage({ params }) {
 
                 if (block.type === "note") {
                   return (
-                    <div key={i} className="bg-yellow-100 border-l-4 border-yellow-600 p-4 rounded">
+                    <div key={i} className="bg-yellow-100 border-l-4 mb-5 border-yellow-600 p-4 rounded">
+                        <p className="text-sm text-yellow-800">
+                        💡 <span className="font-bold text-yellow-900">{block.heading}</span> {block.explanation}
+                        </p>
+                    </div>
+                  );
+                }
+
+                if (block.type === "note") {
+                  return (
+                    <div key={i} className="bg-yellow-100 border-l-4 mb-5 border-yellow-600 p-4 rounded">
                         <p className="text-sm text-yellow-800">
                         💡 <span className="font-bold text-yellow-900">{block.heading}</span> {block.explanation}
                         </p>
