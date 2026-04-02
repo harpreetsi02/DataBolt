@@ -6,7 +6,6 @@ export const lessonContent = {
     title: "What is",
     highlight: "SQL?",
     subtitle: "And why is it one of the most valuable skills you can learn in tech?",
-    hasExercise: false,
 
     points: [
       "What a database is and why every app needs one",
@@ -84,7 +83,6 @@ LIMIT 20;`,
     title: "Your Sample",
     highlight: "Database",
     subtitle: "And why is it one of the most valuable skills you can learn in tech?",
-    hasExercise: false,
 
     points: [
       "The five tables we will query throughout every chapter",
@@ -157,7 +155,6 @@ LIMIT 20;`,
       title: "SELECT",
       highlight: "Query",
       subtitle: "Reading data — every SQL journey starts here.",
-      hasExercise: false,
 
       points: [
         "Reading specific columns with SELECT",
@@ -214,7 +211,6 @@ FROM employees;`,
       title: "FILTERING -",
       highlight: "WHERE",
       subtitle: "WHERE filters which rows come back. Without it, you get every row.",
-      hasExercise: false,
 
       points: [
         "Filtering rows with a single condition",
@@ -224,7 +220,7 @@ FROM employees;`,
 
       blocks: [
         {
-          type: "noteGreen",
+          type: "noteBlue",
           heading: "Think of it this way:",
           explanation: `WHERE is the bouncer at the door. Only rows that satisfy the condition get through to your result. Everyone else it turned away.`,
         },
@@ -286,7 +282,6 @@ WHERE salary > 70000;`,
       title: "AND, OR,",
       highlight: "NOT",
       subtitle: "Combining multiple conditions into one filter.",
-      hasExercise: false,
 
       points: [
         "AND: both conditions must be true",
@@ -362,7 +357,6 @@ WHERE department = 'Sales'
       title: "BETWEEN, IN,",
       highlight: "LIKE",
       subtitle: "Smarter filters for rnages, lists, and patterns.",
-      hasExercise: false,
 
       points: [
         "BETWEEN for range filtering (inclusive)",
@@ -451,7 +445,6 @@ WHERE name LIKE '%a';`,
       title: "NULL - The ",
       highlight: "Mystery Value",
       subtitle: "The concept that trips up almost every SQL beginner.",
-      hasExercise: false,
 
       points: [
         "What NULL actually means (and what it does not mean)",
@@ -524,7 +517,6 @@ FROM employees;`,
       title: "ORDER,",
       highlight: "BY",
       subtitle: "Controlling the sequence of your results.",
-      hasExercise: false,
 
       points: [
         "Ascending (ASC) and descending (DESC) sort",
@@ -582,7 +574,6 @@ ORDER BY department ASC, salary DESC;`,
       title: "LIMIT &",
       highlight: "OFFSET",
       subtitle: `Pagination — how every "Load More" button in every app works.`,
-      hasExercise: false,
 
       points: [
         "LIMIT N - GET only the top N rows",
@@ -649,7 +640,6 @@ ORDER BY name LIMIT 3 OFFSET 3; -- Page 2`,
       title: "Aggregate",
       highlight: "Functions",
       subtitle: "Turning millions of rows into a single meaningful number.",
-      // hasExercise: true,
 
       points: [
         "COUNT — how many rows (with and without NULLs)",
@@ -728,7 +718,6 @@ FROM employees;`,
       title: "GROUP",
       highlight: "BY",
       subtitle: "Aggregating by category — the analytics workhorse.",
-      // hasExercise: true,
 
       points: [
         "How GROUP BY splits data into buckets before aggregating",
@@ -777,7 +766,6 @@ ORDER BY avg_salary DESC;`,
     12: {
       title: "HAVING",
       subtitle: "Filtering groups — the WHERE clause for aggregates.",
-      // hasExercise: true,
 
       points: [
           "Why WHERE cannot be used with aggregate functions",
