@@ -175,17 +175,88 @@ export default async function LessonPage({ params }) {
                                 tasks={block.tasks}
                                 questions={block.questions}
                                 lessonId={id}
+                                defaultQuery={block.defaultQuery}
                             />
                         
                         </div>
                     );
                 }
 
-                if (block.type === "note") {
+                if (block.type === "multipleTable") {           
+                  const tables = Array.isArray(block.data)
+                    ? block.data
+                    : [{ title: block.title, data: block.data }];
+
                   return (
-                    <div key={i} className="bg-yellow-100 border-l-4 mb-5 border-yellow-600 p-4 rounded">
-                        <p className="text-sm text-yellow-800">
-                        💡 <span className="font-bold text-yellow-900">{block.heading}</span> {block.explanation}
+                    <div key={i} className="my-10 overflow-hidden bg-gray-900 rounded-xl">
+                        <h2 className="text-center bg-red-500 text-white text-2xl font-bold py-3">Included Tables in Exercise</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 p-4 gap-6">
+                      {tables.map((table, idx) => (
+                        <div className="" key={idx}>
+                        
+                          <h2 className="text-xl font-semibold text-green-500 mb-3">
+                            <i className="ri-git-repository-line p-2"></i>
+                            Table: {table.title}
+                          </h2>
+                    
+                          <div className="overflow-x-auto">
+                            <table className="w-full text-sm whitespace-nowrap">
+                    
+                              <thead className="bg-green-300 text-gray-800">
+                                <tr>
+                                  {table.data.headers.map((h, j) => (
+                                    <th key={j} className="p-2.5 border">{h}</th>
+                                  ))}
+                                </tr>
+                              </thead>
+                              
+                              <tbody>
+                                {table.data.rows.map((row, j) => (
+                                  <tr key={j} className="odd:bg-green-400/10">
+                                    {row.map((cell, k) => (
+                                      <td key={k} className="px-2.5 py-2 border">
+                                        {cell === null ? "NULL" : cell}
+                                      </td>
+                                    ))}
+                                  </tr>
+                                ))}
+                              </tbody>
+                            
+                            </table>
+                          </div>
+                            
+                        </div>
+                      ))}
+                    </div>
+                    </div>
+                  );
+                }
+
+                if (block.type === "noteGreen") {
+                  return (
+                    <div key={i} className="bg-green-100 border-l-4 mb-5 border-green-600 p-4 rounded">
+                        <p className="text-sm text-green-800">
+                        ✅ <span className="font-bold text-green-900">{block.heading}</span> {block.explanation}
+                        </p>
+                    </div>
+                  );
+                }
+
+                if (block.type === "noteBlue") {
+                  return (
+                    <div key={i} className="bg-blue-100 border-l-4 mb-5 border-blue-600 p-4 rounded">
+                        <p className="text-sm text-blue-800">
+                        🌟 <span className="font-bold text-blue-900">{block.heading}</span> {block.explanation}
+                        </p>
+                    </div>
+                  );
+                }
+
+                if (block.type === "noteRed") {
+                  return (
+                    <div key={i} className="bg-red-100 border-l-4 mb-5 border-red-600 p-4 rounded">
+                        <p className="text-sm text-red-800">
+                        ❌ <span className="font-bold text-red-900">{block.heading}</span> {block.explanation}
                         </p>
                     </div>
                   );

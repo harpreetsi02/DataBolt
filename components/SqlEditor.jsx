@@ -3,11 +3,11 @@
 import { useState, useEffect } from "react";
 import { getDB } from "@/lib/initDB";
 
-export default function SqlEditor({ tasks = [], questions = [], lessonId, exerciseName }) {
+export default function SqlEditor({ tasks = [], questions = [], lessonId, exerciseName, defaultQuery }) {
   const [query, setQuery] = useState("");
   const [result, setResult] = useState(null);
   const [taskIndex, setTaskIndex] = useState(0);
-  const defaultQuery = "SELECT * FROM employees;";
+  const fallbackQuery = defaultQuery || "SELECT * FROM employees;";
 
   const normalizeQuery = (q) => {
     return q
@@ -26,9 +26,9 @@ export default function SqlEditor({ tasks = [], questions = [], lessonId, exerci
 
   // 🔥 default query run
   useEffect(() => {
-    setQuery(defaultQuery);
-    runQuery(defaultQuery);
-  }, []);
+    setQuery(fallbackQuery);
+    runQuery(fallbackQuery);
+  }, [fallbackQuery]);
 
   const runQuery = async (customQuery) => {
     const db = await getDB();
@@ -98,7 +98,7 @@ export default function SqlEditor({ tasks = [], questions = [], lessonId, exerci
                 const trimmed = val.trim();
 
                 if (trimmed === ""){
-                    runQuery(defaultQuery);
+                    runQuery(fallbackQuery);
                     return;
                 }
 
