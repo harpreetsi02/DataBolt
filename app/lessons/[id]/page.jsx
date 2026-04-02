@@ -55,6 +55,11 @@ export default async function LessonPage({ params }) {
                               {block.subtitle}
                             </p>
 
+                            <p className="text-red-500 flex items-center gap-2">
+                              <i className="ri-send-plane-2-fill"></i>
+                              {block.queryName}
+                            </p>
+
                             {/* CODE BLOCK */}
                             <div className="bg-gray-900 text-gray-400 p-4 rounded-lg overflow-x-auto text-sm">
                                 <pre>

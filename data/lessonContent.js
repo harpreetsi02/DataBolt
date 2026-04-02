@@ -1,3 +1,4 @@
+import { headers } from "next/headers";
 import { dbTables } from "./dbTables";
 
 export const lessonContent = {
@@ -1227,7 +1228,489 @@ ORDER BY t.spent DESC;`,
           type: "note",
           heading: "Engineering Insight:",
           explanation: "CTEs do not always improve performance — in some databases they are materialised (computed once and cached), in others they are inlined as subqueries. PostgreSQL inlines by default; you can force materialisation with the MATERIALIZED keyword. Always check your EXPLAIN plan."
+        },
+
+        {
+          type: "multipleTable",
+          data: [
+            {
+              title: "Orders",
+              data: dbTables.orders
+            },
+            {
+              title: "Customers",
+              data: dbTables.customers
+            },
+            {
+              title: "order_items",
+              data: dbTables.order_items
+            },
+            {
+              title: "products",
+              data: dbTables.products
+            },
+          ]
+        },
+
+        {
+          type: "exercise",
+          exersiceName: "Tables: Customers",
+          defaultQuery: "SELECT * FROM customers;",
+          tasks: [
+            "WITH order_totals AS (SELECT customer_id, SUM(total) AS total_spent FROM orders GROUP BY customer_id) SELECT * FROM order_totals;",
+
+            "WITH high_value_orders AS (SELECT * FROM orders WHERE total > 50000) SELECT order_id, customer_id, total FROM high_value_orders;",
+
+            "WITH customer_orders AS (SELECT customer_id, COUNT(order_id) AS total_orders FROM orders GROUP BY customer_id) SELECT customers.name, customer_orders.total_orders FROM customers LEFT JOIN customer_orders ON customers.customer_id = customer_orders.customer_id;",
+
+            "WITH avg_price AS (SELECT AVG(price) AS avg_p FROM products) SELECT name, price FROM products WHERE price > (SELECT avg_p FROM avg_price);",
+
+            "WITH order_summary AS (SELECT customer_id, SUM(total) AS total_spent FROM orders GROUP BY customer_id), high_spenders AS (SELECT customer_id FROM order_summary WHERE total_spent > 50000) SELECT customers.name FROM customers INNER JOIN high_spenders ON customers.customer_id = high_spenders.customer_id;"
+          ],
+          questions: [
+            "Create a CTE to calculate total spending per customer.",
+
+            "Create a CTE for orders where total is greater than 50000 and display them.",
+
+            "Create a CTE to count total orders per customer and show customer names with their order count.",
+
+            "Create a CTE to calculate average product price and find products priced above average.",
+
+            "Use multiple CTEs to find customers who have spent more than 50000 in total."
+          ],
         }
+      ]
+    },
+
+    17: {
+      title: "CASE",
+      highlight: "Statements",
+      subtitle: "If-else logic that lives inside your SQL.",
+
+      points: [
+          "CASE WHEN ... THEN ... END syntax",
+          "Using CASE to label and categorise rows",
+          "CASE inside aggregate functions — the pivot pattern"
+      ],
+
+      blocks: [
+        {
+          type: "queryTable",
+          title: "17.1 - Basic Case",
+          queryName: "Label employees by salary band",
+          code: `SELECT name, salary,
+    CASE
+        WHEN salary < 60000 THEN 'Junior'
+        WHEN salary < 75000 THEN 'Mid-Level'
+        ELSE 'Senior'
+    END AS band
+FROM employees ORDER BY salary;`,
+          data: dbTables.employees
+        },
+
+        {
+          type: "queryTable",
+          title: "17.2 - CASE in Aggregates (The Pivot Pattern)",
+          queryName: "Count by band in one row",
+          code: `SELECT
+    SUM(CASE WHEN salary < 60000 THEN 1 ELSE 0 END) AS junior,
+    SUM(CASE WHEN salary BETWEEN 60000 AND 74999 THEN 1 ELSE 0 END)
+AS mid,
+    SUM(CASE WHEN salary >= 75000 THEN 1 ELSE 0 END) AS senior
+FROM employees;`,
+          data: dbTables.employees
+        },
+
+        {
+          type: "noteGreen",
+          heading: "Interview Tip:",
+          explanation: " This SUM(CASE WHEN ... END) pattern is the standard way to pivot rows into columns in SQL. It appears in almost every data analyst/data engineer interview. Know it cold."
+        },
+
+        {
+          type: "exercise",
+          exersiceName: "Table: Employees",
+          tasks: [
+            "SELECT name, salary, CASE WHEN salary > 70000 THEN 'High' ELSE 'Low' END AS salary_level FROM employees;",
+
+            "SELECT name, department, CASE WHEN department = 'IT' THEN 'Tech' ELSE 'Non-Tech' END AS dept_type FROM employees;",
+
+            "SELECT name, salary, CASE WHEN salary < 60000 THEN 'Low' WHEN salary BETWEEN 60000 AND 80000 THEN 'Medium' ELSE 'High' END AS salary_category FROM employees;",
+
+            "SELECT name, manager_id, CASE WHEN manager_id IS NULL THEN 'No Manager' ELSE 'Has Manager' END AS manager_status FROM employees;",
+
+            "SELECT name, department, salary, CASE WHEN department = 'IT' AND salary > 70000 THEN 'Top IT' WHEN department = 'HR' THEN 'HR Team' ELSE 'Other' END AS category FROM employees;"
+          ],
+          questions: [
+            "Classify employees as 'High' or 'Low' based on salary greater than 70000.",
+
+            "Classify employees as 'Tech' or 'Non-Tech' based on department.",
+
+            "Categorize employees into 'Low', 'Medium', and 'High' salary groups.",
+
+            "Show whether an employee has a manager or not.",
+
+            "Create a custom category: 'Top IT' for IT employees with salary > 70000, 'HR Team' for HR, and 'Other' for rest."
+          ],
+        }
+      ]
+    },
+
+    18: {
+      title: "Window",
+      highlight: "Functions",
+      subtitle: "The feature that separates intermediate from advanced SQL.",
+
+      points: [
+        "How window functions differ from GROUP BY",
+        "ROW_NUMBER, RANK, DENSE_RANK",
+        "The Top-N-per-group pattern — used everywhere",
+        "Running totals with SUM() OVER",
+        "LAG and LEAD — looking backward and forward",
+        "NTILE for percentile buckets"
+      ],
+
+      blocks: [
+        {
+          type: "noteBlue",
+          heading: "Think of it this way:",
+          explanation: "GROUP BY puts everyone in separate rooms and gives you a summary per room. Window functions keep everyone in the same room, but give each person their own name tag showing their rank, their group's average, and how they compare. You get the detail AND the summary."
+        },
+
+        {
+          type: "query",
+          heading: "Syntax",
+          code: `function_name() OVER (
+    PARTITION BY column   -- divide rows into groups (optional)
+    ORDER BY column       -- order within each group
+    ROWS/RANGE ...        -- window frame (advanced, optional)
+)`
+        },
+
+        {
+          type: "queryTable",
+          title: "18.1 -  ROW_NUMBER per Department",
+          queryName: "SQL",
+          code: `SELECT name, department, salary,
+    ROW_NUMBER() OVER (PARTITION BY department ORDER BY salary DESC)
+AS rank_in_dept
+FROM employees
+ORDER BY department, rank_in_dept;`,
+          data: dbTables.employees
+        },
+
+        {
+          type: "queryTable",
+          title: "18.2 -  Top Earner per Department",
+          queryName: "The Top-N-per-group pattern — learn this by heart",
+          code: `WITH ranked AS (
+    SELECT *,
+        ROW_NUMBER() OVER (PARTITION BY department ORDER BY salary
+DESC) AS rn
+    FROM employees
+)
+SELECT name, department, salary
+FROM ranked
+WHERE rn = 1;`,
+          data: dbTables.employees
+        },
+
+        {
+          type: "queryTable",
+          title: "18.2 -  Top Earner per Department",
+          queryName: "The Top-N-per-group pattern — learn this by heart",
+          code: `WITH ranked AS (
+    SELECT *,
+        ROW_NUMBER() OVER (PARTITION BY department ORDER BY salary
+DESC) AS rn
+    FROM employees
+)
+SELECT name, department, salary
+FROM ranked
+WHERE rn = 1;`,
+          data: dbTables.employees
+        },
+
+        {
+          type: "summaryTable",
+          title: "18.3 - RANK vs DENSE_RANK",
+          headers: ["Function", "Tie behaviour", "Sequence: 100, 90, 90, 80"],
+          rows: [
+            ["ROW_NUMBER()", "Arbitary", "1, 2, 3, 4"],
+            ["RANK()", "Same rank, skip next", "1, 2, 2, 4 (3 is skipped)"],
+            ["DENSE_RANK()", "Same rank, no skip", "1, 2, 2, 3 (consecutive)"]
+          ]
+        },
+
+        {
+          type: "queryTable",
+          title: "18.4 -  Running Total",
+          queryName: "SQL",
+          code: `SELECT order_id, order_date, total,
+    SUM(total) OVER (ORDER BY order_date) AS running_total
+FROM orders;`,
+          data: dbTables.employees
+        },
+
+        {
+          type: "queryTable",
+          title: "18.5 -  LAG & LEAD",
+          queryName: "Each order vs previous and next order",
+          code: `SELECT order_id, total,
+    LAG(total) OVER (ORDER BY order_date) AS prev_total,
+    LEAD(total) OVER (ORDER BY order_date) AS next_total
+FROM orders;`,
+          data: dbTables.employees
+        },
+
+        {
+          type: "note",
+          heading: "Engineering Insight:",
+          explanation: "Window functions were designed specifically for analytics workloads. Netflix uses them for viewing streak calculations, Uber for surge pricing windows, Swiggy for peak-hour analysis. Every data engineering role at a FAANG-level company expects fluency with window functions."
+        },
+
+        {
+          type: "noteGreen",
+          heading: "Interview Tip:",
+          explanation: "'Write a query to find the second highest salary in each department' is a top-5 SQL interview question at Amazon, Microsoft and Google. The answer: ROW_NUMBER() or DENSE_RANK() inside a CTE."
+        },
+
+        {
+          type: "exercise",
+          exersiceName: "Table: Employees",
+          tasks: [
+            "SELECT name, salary, ROW_NUMBER() OVER (ORDER BY salary DESC) AS row_num FROM employees;",
+
+            "SELECT name, salary, RANK() OVER (ORDER BY salary DESC) AS rank_num FROM employees;",
+
+            "SELECT name, department, salary, ROW_NUMBER() OVER (PARTITION BY department ORDER BY salary DESC) AS dept_rank FROM employees;",
+
+            "SELECT name, department, salary, RANK() OVER (PARTITION BY department ORDER BY salary DESC) AS dept_rank FROM employees;",
+
+            "SELECT name, salary, AVG(salary) OVER () AS avg_salary FROM employees;"
+          ],
+          questions: [
+            "Assign a row number to each employee based on salary (highest first).",
+
+            "Rank employees based on salary (highest first).",
+
+            "Assign row numbers within each department based on salary (highest first).",
+
+            "Rank employees within each department based on salary.",
+
+            "Show each employee's salary along with the average salary of all employees."
+          ],
+        }
+      ]
+    },
+
+    19: {
+      title: "String",
+      highlight: "Functions",
+      subtitle: "Manipulating and transforming text data.",
+
+      points: [
+          "UPPER, LOWER, TRIM — basic cleanup",
+          "CONCAT — combining strings",
+          "SUBSTRING, LEFT, RIGHT — extracting parts",
+          "REPLACE, INSTR — search and replace"
+      ],
+
+      blocks: [
+        {
+          type: "summaryTable",
+          headers: ["Function", "What It Does", "Example → Output"],
+          rows: [
+            ["UPPER(str)", "Convert to uppercase", "UPPER('sql book') → 'SQL BOOK'"],
+            ["LOWER(str)", "Convert to lowercase", "LOWER('SQL') → 'sql'"],
+            ["TRIM(str)", "Remove leading + trailing spaces", "TRIM(' hi ') → 'hi'"],
+            ["LENGTH(str)", "Number of characters", "LENGTH('Arjun') → 5"],
+            ["CONCAT(s1,s2,...)", "Join strings", "CONCAT('Hello','SQL') → 'Hello SQL'"],
+            ["LEFT(str,n)", "First n characters", "LEFT('Bangalore',4) → 'Bang'"],
+            ["RIGHT(str,n)", "Last n characters", "RIGHT('Bangalore',4) → 'lore'"],
+            ["SUBSTRING(s,pos,n)", "Extract n chars from position", "SUBSTRING('Hyderabad',2,5) → 'yderi'"],
+            ["REPLACE(s,old,new)", "Replace all occurrences", "REPLACE('SQL is hard','hard','easy')"],
+            ["INSTR(str,sub)", "Position of substring", "INSTR('Hyderabad','bad') → 7"]
+          ]
+        },
+
+        {
+          type: "queryTable",
+          title: "Real Examples",
+          queryName: "Full display string with city",
+          code: `SELECT CONCAT(name, ' — ', city, ', ', country) AS profile
+FROM customers;`,
+          data: dbTables.customers
+        },
+
+        {
+          type: "multipleTable",
+          data: [
+            {
+              title: "Employees",
+              data: dbTables.employees
+            },
+            {
+              title: "Customers",
+              data: dbTables.customers
+            }
+          ]
+        },
+
+        {
+          type: "exercise",
+          exersiceName: "Tables: Employees & Customers",
+          tasks: [
+            "SELECT name, UPPER(name) AS upper_name FROM employees;",
+
+            "SELECT name, LOWER(name) AS lower_name FROM customers;",
+
+            "SELECT name, LENGTH(name) AS name_length FROM employees;",
+
+            "SELECT name, CONCAT(name, ' - ', department) AS full_info FROM employees;",
+
+            "SELECT name, SUBSTRING(city, 1, 3) AS short_city FROM customers;"
+          ],
+          questions: [
+            "Convert all employee names to uppercase.",
+
+            "Convert all customer names to lowercase.",
+
+            "Find the length of each employee's name.",
+
+            "Combine employee name and department into a single column.",
+
+            "Extract first 3 characters of each customer's city."
+          ],
+        }
+      ]
+    },
+
+    20: {
+      title: "Data & Time",
+      highlight: "Functions",
+      subtitle: "Working with dates - extraction, arithmetic, formatting.",
+
+      points: [
+          "Getting current date and time",
+          "Extracting year, month, day from a date",
+          "Calculating differences between dates",
+          "Adding and subtracting intervals",
+          "Filtering by date ranges"
+      ],
+
+      blocks: [
+        {
+          type: "summaryTable",
+          headers: ["Function", "Returns", "Example"],
+          rows: [
+            ["NOW()", "Current date + time", "2024-03-29 14:30:00"],
+            ["CURDATE()", "Current date only", "2024-03-29"],
+            ["YEAR(date)", "Year integer", "YEAR('2024-03-29') → 2024"],
+            ["MONTH(date)", "Month integer", "MONTH('2024-03-29') → 3"],
+            ["DAY(date)", "Day integer", "DAY('2024-03-29') → 29"],
+            ["MONTHNAME(date)", "Month name", "MONTHNAME('2024-03-29') → March"],
+            ["DAYNAME(date)", "Weekday name", "DAYNAME('2024-03-29') → Friday"],
+            ["DATEDIFF(d1,d2)", "Days between dates", "DATEDIFF('2024-12-31','2024-01-01') → 365"],
+            ["TIMESTAMPDIFF(unit,d1,d2)", "Difference in any unit", "TIMESTAMPDIFF(YEAR, dob, CURDATE())"],
+            ["DATE_ADD(date, INTERVAL n)", "Add to a date", "DATE_ADD('2024-01-01', INTERVAL 30 DAY)"],
+            ["DATE_SUB(date, INTERVAL n)", "Subtract from a date", "DATE_SUB(CURDATE(), INTERVAL 90 DAY)"]
+          ]
+        },
+
+        {
+          type: "query",
+          heading: "Example",
+          queryName: "Order from the last 90 days",
+          code: `SELECT order_id, order_date, total
+FROM orders
+WHERE order_date >= DATE_SUB(CURDATE(), INTERVAL 90 DAY);`
+        }
+      ]
+    },
+
+    21: {
+      title: "INSERT, UPDATE,",
+      highlight: "DELETE",
+      subtitle: "Modifying data — the right way, safely.",
+
+      points: [
+          "adding single and multiple rows",
+          "UPDATE — modifying existing data with WHERE",
+          "DELETE — removing rows safely",
+          "The golden rule: always test with SELECT first"
+      ],
+
+      blocks: [
+        {
+          type: "query",
+          heading: "21.1 - INSERT",
+          queryName: "SQL",
+          code: `INSERT INTO employees (name, department, salary, hire_date)
+VALUES ('Nisha', 'IT', 71000, '2024-03-01');
+-- Multiple rows at once
+INSERT INTO employees (name, department, salary, hire_date) VALUES
+    ('Akash', 'Sales', 58000, '2024-04-01'),
+    ('Pooja', 'HR', 62000, '2024-04-15');`
+        },
+
+        {
+          type: "query",
+          heading: "21.2 - UPDATE",
+          queryName: "10% raise for all IT employees",
+          code: `UPDATE employees
+SET salary = salary * 1.10
+WHERE department = 'IT';`
+        },
+
+        {
+          type: "note",
+          heading: "Watch Out:",
+          explanation: "Always include a WHERE clause in UPDATE. 'UPDATE employees SET salary = salary * 1.10' with no WHERE gives everyone a raise — not just IT. This is called a 'fat finger' mistake and it has caused real production incidents at major companies."
+        },
+
+        {
+          type: "query",
+          heading: "21.3 - DELETE",
+          queryName: "SQL",
+          code: `-- Safe workflow: SELECT first, then DELETE
+SELECT * FROM employees WHERE salary < 50000;        -- verify what
+will be deleted
+DELETE FROM employees WHERE salary < 50000;          -- then delete`
+        },
+
+        {
+          type: "noteGreen",
+          heading: "Pro Tips:",
+          explanation: "Wrap destructive operations in a transaction: START TRANSACTION; DELETE ...; ROLLBACK; — verify, then COMMIT when satisfied. This is standard practice at any serious engineering team."
+        },
+
+        {
+  type: "exercise",
+  exersiceName: "Table: Employees",
+  tasks: [
+    "INSERT INTO employees (emp_id, name, department, salary, manager_id, hire_date) VALUES (9, 'Amit', 'IT', 70000, 1, '2024-06-01');",
+    
+    "INSERT INTO employees (emp_id, name, department, salary, manager_id, hire_date) VALUES (10, 'Neha', 'HR', 65000, 4, '2024-07-10');",
+    
+    "UPDATE employees SET salary = 75000 WHERE name = 'Amit';",
+    
+    "UPDATE employees SET department = 'Marketing' WHERE emp_id = 3;",
+    
+    "DELETE FROM employees WHERE salary < 60000;"
+  ],
+  questions: [
+    "Insert a new employee named Amit in IT department.",
+    
+    "Insert a new employee named Neha in HR department.",
+    
+    "Update salary of Amit to 75000.",
+    
+    "Change department of employee with emp_id 3 to Marketing.",
+    
+    "Delete employees whose salary is less than 60000."
+  ],
+}
       ]
     }
 };

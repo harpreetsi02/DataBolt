@@ -74,7 +74,7 @@ export default function SqlEditor({ tasks = [], questions = [], lessonId, exerci
               </thead>
               <tbody>
                 {result.values.map((row, i) => (
-                  <tr key={i} className="odd:bg-gray-800">
+                  <tr key={i} className="odd:bg-gray-800 whitespace-nowrap text-center">
                     {row.map((val, j) => (
                       <td key={j} className="p-2 border">
                         {val === null ? "NULL" : val}
@@ -88,7 +88,7 @@ export default function SqlEditor({ tasks = [], questions = [], lessonId, exerci
         )}
 
         {/* EDITOR */}
-        <div className="p-4 bg-gray-900 rounded-xl">
+        <div className="p-2.5 bg-gray-900 rounded-xl">
           <textarea
             value={query}
             onChange={(e) => {
