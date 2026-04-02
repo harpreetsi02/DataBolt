@@ -86,7 +86,7 @@ export default async function LessonPage({ params }) {
                       </p>
                 
                       {/* CODE */}
-                      <div className="bg-gray-900 w-4/5 ml-5 mb-10 text-gray-400 p-4 rounded-lg overflow-x-auto text-sm">
+                      <div className="bg-gray-900 md:w-4/5 ml-5 mb-10 text-gray-400 p-4 rounded-lg overflow-x-auto text-sm">
                         <pre>{block.code}</pre>
                       </div>
                 
