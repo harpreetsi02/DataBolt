@@ -7,6 +7,7 @@ export default function SqlEditor({ tasks = [], questions = [], lessonId, exerci
   const [query, setQuery] = useState("");
   const [result, setResult] = useState(null);
   const [taskIndex, setTaskIndex] = useState(0);
+  const defaultQuery = "SELECT * FROM employees;";
 
     const showSolution = () => {
             if (tasks[taskIndex]) {
@@ -15,41 +16,33 @@ export default function SqlEditor({ tasks = [], questions = [], lessonId, exerci
         }    
     };
 
-  // 🔥 load saved progress
-//   useEffect(() => {
-//     const saved = Number(localStorage.getItem(`lesson-${lessonId}-task`) || 0);
-//     setTaskIndex(saved);
-//   }, [lessonId]);
-
   // 🔥 default query run
   useEffect(() => {
-    setQuery("SELECT * FROM employees;");
-    runQuery("SELECT * FROM employees;");
+    setQuery(defaultQuery);
+    runQuery(defaultQuery);
   }, []);
 
   const runQuery = async (customQuery) => {
     const db = await getDB();
     const q = customQuery || query;
-
+  
     try {
       const res = db.exec(q);
-
+  
       if (res.length > 0) {
         setResult(res[0]);
-
-        // ✅ check correct query
+      
+        // ✅ task check
         if (
           tasks[taskIndex] &&
           q.trim().toLowerCase() === tasks[taskIndex].toLowerCase()
         ) {
-          const next = taskIndex + 1;
-          setTaskIndex(next);
-
-          localStorage.setItem(`lesson-${lessonId}-task`, next);
+          setTaskIndex(taskIndex + 1);
         }
       }
     } catch (err) {
-      alert(err.message);
+      // 🔥 SILENT FAIL (most important)
+      return;
     }
   };
   
@@ -90,7 +83,25 @@ export default function SqlEditor({ tasks = [], questions = [], lessonId, exerci
         <div className="p-4 bg-gray-900 rounded-xl">
           <textarea
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => {
+                const val = e.target.value;
+                setQuery(val);
+
+                const trimmed = val.trim();
+
+                if (trimmed === ""){
+                    runQuery(defaultQuery);
+                    return;
+                }
+
+                if (trimmed.endsWith(";")) {
+                    try {
+                        runQuery(val);
+                    } catch (err) {
+                        //  ignore error while typing
+                    }
+                }
+            }}
             className="w-full h-32 p-3 bg-black text-green-400 font-mono rounded"
           />
 
@@ -129,16 +140,14 @@ export default function SqlEditor({ tasks = [], questions = [], lessonId, exerci
         ))}
       </div>
       <div className="mt-4 text-sm text-gray-400">
-  Stuck? Read this task's{" "}
-  <button
-    onClick={showSolution}
-    className="text-blue-400 underline"
-  >
-    Solution
-  </button>
-  
-</div>
-
+        Stuck? Read this task's{" "}
+        <button
+          onClick={showSolution}
+          className="text-blue-400 underline"
+        >
+          Solution
+        </button>
+      </div>
     </div>
   );
 }
