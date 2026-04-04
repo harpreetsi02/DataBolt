@@ -650,7 +650,7 @@ ORDER BY name LIMIT 3 OFFSET 3; -- Page 2`,
 
       blocks: [
         {
-          type: "noteGreen",
+          type: "noteBlue",
           heading: "Think of it this way:",
           explanation: "Aggregate functions are like a cashier totalling your bill. You bring 20 items (rows) to the counter; they give you back one number (the total). The individual items are collapsed into a single summary."
         },
@@ -1613,6 +1613,33 @@ FROM customers;`,
           code: `SELECT order_id, order_date, total
 FROM orders
 WHERE order_date >= DATE_SUB(CURDATE(), INTERVAL 90 DAY);`
+        },
+
+        {
+          type: "exercise",
+          exersiceName: "Table: Employees (Date Functions)",
+          tasks: [
+            "SELECT name, YEAR(hire_date) AS join_year FROM employees;",
+          
+            "SELECT name, MONTH(hire_date) AS join_month FROM employees;",
+          
+            "SELECT name, MONTHNAME(hire_date) AS monthname FROM employees;",
+          
+            "SELECT name, DATE_ADD(hire_date, INTERVAL 7 DAY) AS new_date FROM employees;",
+          
+            "SELECT name, DATEDIFF(CURDATE(), hire_date) AS days_worked FROM employees;"
+          ],
+          questions: [
+            "Show each employee's name along with the year they were hired.",
+          
+            "Display the month number in which each employee was hired.",
+          
+            "Display the month name in which each employee was hired.",
+          
+            "Add 7 days to each employee's hire date and display the new date.",
+          
+            "Calculate how many days each employee has worked till today."
+          ]
         }
       ]
     },
@@ -1674,31 +1701,254 @@ DELETE FROM employees WHERE salary < 50000;          -- then delete`
         },
 
         {
-  type: "exercise",
-  exersiceName: "Table: Employees",
-  tasks: [
-    "INSERT INTO employees (emp_id, name, department, salary, manager_id, hire_date) VALUES (9, 'Amit', 'IT', 70000, 1, '2024-06-01');",
-    
-    "INSERT INTO employees (emp_id, name, department, salary, manager_id, hire_date) VALUES (10, 'Neha', 'HR', 65000, 4, '2024-07-10');",
-    
-    "UPDATE employees SET salary = 75000 WHERE name = 'Amit';",
-    
-    "UPDATE employees SET department = 'Marketing' WHERE emp_id = 3;",
-    
-    "DELETE FROM employees WHERE salary < 60000;"
-  ],
-  questions: [
-    "Insert a new employee named Amit in IT department.",
-    
-    "Insert a new employee named Neha in HR department.",
-    
-    "Update salary of Amit to 75000.",
-    
-    "Change department of employee with emp_id 3 to Marketing.",
-    
-    "Delete employees whose salary is less than 60000."
-  ],
-}
+          type: "exercise",
+          exersiceName: "Table: Employees (Insert, Update, Delete)",
+          tasks: [
+            "INSERT INTO employees VALUES (9, 'Rohit', 'IT', 75000, 1, '2024-01-10');",
+          
+            "INSERT INTO employees (emp_id, name, department, salary, manager_id, hire_date) VALUES (10, 'Neha', 'HR', 62000, 4, '2023-12-01');",
+          
+            "UPDATE employees SET salary = 80000 WHERE name = 'Priya';",
+          
+            "UPDATE employees SET department = 'Marketing' WHERE emp_id = 3;",
+          
+            "DELETE FROM employees WHERE emp_id = 8;",
+          
+            "DELETE FROM employees WHERE department = 'HR';"
+          ],
+          questions: [
+            "Insert a new employee named Rohit into the employees table.",
+          
+            "Insert a new employee Neha by specifying column names explicitly.",
+          
+            "Update Priya's salary to 80000.",
+          
+            "Change Rahul's department to Marketing using emp_id.",
+          
+            "Delete the employee whose emp_id is 8.",
+          
+            "Delete all employees who belong to the HR department."
+          ]
+        }
+      ]
+    },
+
+    22: {
+      title: "CREATE TABLE",
+      highlight: "& DDL",
+      subtitle: "Designing and modifying database structure.",
+
+      points: [
+          "CREATE TABLE with all constraint types",
+          "PRIMARY KEY, FOREIGN KEY, NOT NULL, UNIQUE, DEFAULT, CHECK",
+          "ALTER TABLE — adding, modifying, dropping columns",
+          "DROP TABLE — remove a table entirely"
+      ],
+
+      blocks: [
+        {
+          type: "query",
+          queryName: "Creating our employees table from scratch",
+          code: `CREATE TABLE employees (
+    emp_id        INT PRIMARY KEY AUTO_INCREMENT,
+    name          VARCHAR(100)    NOT NULL,
+    department    VARCHAR(50)     NOT NULL,
+    salary        DECIMAL(10,2)   NOT NULL DEFAULT 0.00,
+    manager_id    INT,
+    hire_date     DATE            NOT NULL,
+    CONSTRAINT chk_salary CHECK (salary >= 0),
+    FOREIGN KEY (manager_id) REFERENCES employees(emp_id)
+);`
+        },
+
+        {
+          type: "summaryTable",
+          title: "Constraints Reference",
+          headers: ["Constraint", "Purpose"],
+          rows: [
+            ["PRIMARY KEY", "Unique + NOT NULL identifier for every row"],
+            ["NOT NULL", "Column cannot be omitted or set to NULL"],
+            ["UNIQUE", "All values in this column must be different across rows"],
+            ["DEFAULT", "Value used automatically when INSERT omits this column"],
+            ["CHECK(condition)", "INSERT/UPDATE fails if condition evaluates to false"],
+            ["FOREIGN KEY", "Value must exist in the referenced table (referential integrity)"],
+            ["AUTO_INCREMENT", "Database automatically assigns the next integer value"]
+          ]
+        },
+
+        {
+          type: "query",
+          heading: "ALTER TABLE",
+          queryName: "SQL",
+          code: `ALTER TABLE employees ADD COLUMN phone VARCHAR(15);
+ALTER TABLE employees MODIFY COLUMN salary DECIMAL(12,2) NOT NULL;
+ALTER TABLE employees DROP COLUMN phone;
+ALTER TABLE employees RENAME COLUMN department TO dept;`
+        },
+      ]
+    },
+
+    23: {
+      title: "Indexes &",
+      highlight: "Performance",
+      subtitle: "The single most impactful performance tool available to you.",
+
+      points: [
+          "What an index is and how it works internally",
+          "When to add indexes and when not to",
+          "Composite indexes and column order",
+          "Using EXPLAIN to verify index usage"
+      ],
+
+      blocks: [
+        {
+          type: "noteBlue",
+          heading: "Think of it this way:",
+          explanation: "An index on a database column is like the index at the back of a textbook. Without it, to find every mention of 'GROUP BY' you read every page (full table scan). With an index, you jump directly to page 78. The bigger the book, the more dramatic the difference."
+        },
+
+        {
+          type: "query",
+          queryName: "SQL",
+          code: `-- Create a standard index
+CREATE INDEX idx_department ON employees(department);
+-- Composite index (order matters — most selective column first)
+CREATE INDEX idx_dept_salary ON employees(department, salary);
+-- Unique index (also enforces data integrity)
+CREATE UNIQUE INDEX idx_email ON customers(email);
+-- Check if index is being used
+EXPLAIN SELECT * FROM employees WHERE department = 'IT';`
+        },
+
+        {
+          type: "summaryTable",
+          title: "Index Rules",
+          headers: ["Rule", "Explanation"],
+          rows: [
+            ["Index WHERE columns", "Columns in WHERE clauses benefit most from indexes"],
+            ["Index JOIN ON columns", "Foreign key columns used in JOINs should always be indexed"],
+            ["Index ORDER BY columns", "Indexes can serve ORDER BY and avoid a sort operation"],
+            ["Composite index order", "Put the most selective column first (e.g., dept, salary)"],
+            ["Do not over-index", "Every index slows INSERT/UPDATE/DELETE. Index only what you query"],
+            ["EXPLAIN is your friend", "Look for type='ALL' (bad) vs 'ref' or 'eq_ref' (good, index used)"]
+          ]
+        },
+
+        {
+          type: "note",
+          heading: "Engineering Insight:",
+          explanation: "At Facebook's scale, adding or removing a single index on a hot table is treated as a high-risk migration requiring a review by a database reliability engineer. A missing index on a 50-billion-row table means queries take minutes instead of milliseconds."
+        }
+      ]
+    },
+
+    24: {
+      title: "Transactions &",
+      highlight: "ACID",
+      subtitle: "Data integrity — guaranteeing your data is always correct.",
+
+      points: [
+          "What a transaction is and why it matters",
+          "START TRANSACTION, COMMIT, ROLLBACK",
+          "ACID: Atomicity, Consistency, Isolation, Durability",
+          "SAVEPOINT for partial rollbacks"
+      ],
+
+      blocks: [
+        {
+          type: "noteBlue",
+          heading: "Think of it this way:",
+          explanation: "A bank transfer: deduct ₹5,000 from Account A, add ₹5,000 to Account B. If the server crashes after the deduction but before the credit, the money disappears. A transaction guarantees either BOTH operations succeed or NEITHER does — the money cannot vanish."
+        },
+
+        {
+          type: "query",
+          queryName: "Safe money transfer",
+          code:  `START TRANSACTION;
+UPDATE accounts SET balance = balance - 5000 WHERE account_id =
+101;
+UPDATE accounts SET balance = balance + 5000 WHERE account_id =
+202;
+COMMIT; -- only if both succeed
+-- If anything fails:
+ROLLBACK; -- reverts both updates completely`
+        },
+
+        {
+          type: "summaryTable",
+          headers: ["Property", "Guarantee", "Bank Transfer Example"],
+          rows: [
+            ["Atomicity", "All changes commit or none do", "Debit + credit both happen or neither"],
+            ["Consistency", "DB remains valid before and after", "Total money in system stays the same"],
+            ["Isolation", "Concurrent transactions do not interfere", "Two simultaneous transfers do not corrupt each other"],
+            ["Durability", "Committed data survives crashes", "After COMMIT, data is on disk even if power cuts"]
+          ]
+        }
+      ]
+    },
+
+    25: {
+      title: "SQL Execution",
+      highlight: "Order",
+      subtitle: "The secret that explains 80% of SQL errors.",
+
+      points: [
+          "The actual order SQL clauses execute (it is not what you write)",
+          "Why you cannot use SELECT aliases in WHERE",
+          "Why aggregate functions are forbidden in WHERE",
+          "How to write queries with this knowledge"
+      ],
+
+      blocks: [
+        {
+          type: "summaryTable",
+          subtitle: "You write SQL in this order: SELECT → FROM → WHERE → GROUP BY → HAVING → ORDER BY → LIMIT",
+          queryName: "But SQL excute in this order:",
+          headers: ["Execution Step", "Clause", "What happens"],
+          rows: [
+            ["1", "FROM", "Identify the source table(s)"],
+            ["2", "JOIN", "Combine joined tables"],
+            ["3", "WHERE", "Filter individual rows"],
+            ["4", "GROUP BY", "Group remaining rows"],
+            ["5", "HAVING", "Filter groups"],
+            ["6", "SELECT", "Compute output columns and aliases"],
+            ["7", "DISTINCT", "Remove duplicate rows"],
+            ["8", "ORDER BY", "Sort the result"],
+            ["9", "LIMIT", "Restrict row count"]
+          ]
+        },
+
+        {
+          type: "query",
+          heading: "The Practical Implications",
+          queryName: "These FAIL - and now you know why",
+          code: `-- FAILS: WHERE runs before SELECT, alias 'annual' doesn't exist
+yet
+SELECT salary * 12 AS annual FROM employees WHERE annual > 100000;
+-- FAILS: WHERE cannot use aggregate functions
+SELECT department FROM employees WHERE COUNT(*) > 2;
+-- FAILS: HAVING is not available without GROUP BY in most dialects
+SELECT name FROM employees HAVING salary > 70000;`
+        },
+
+        {
+          type: "query",
+          queryName: "These FAIL - and now you know why",
+          code: `-- Use the expression directly in WHERE
+SELECT salary * 12 AS annual FROM employees WHERE salary * 12 >
+100000;
+-- Use HAVING for aggregate filters
+SELECT department FROM employees GROUP BY department HAVING
+COUNT(*) > 2;
+-- Alias is fine in ORDER BY (runs after SELECT)
+SELECT salary * 12 AS annual FROM employees ORDER BY annual DESC;`
+        },
+
+        {
+          type: "noteGreen",
+          heading: "Interview Tips:",
+          explanation: "Why can't I use a SELECT alias in a WHERE clause?' is a common interview screening question. It filters candidates who have merely memorised syntax from those who understand how SQL actually executes."
+        }
       ]
     }
 };

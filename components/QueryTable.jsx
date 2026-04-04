@@ -2,16 +2,47 @@
 
 import { useEffect, useState } from "react";
 import { getDB } from "@/lib/initDB";
+import { transformQuery } from "@/lib/sqlTransformer";
 
 export default function QueryTable({ query }) {
   const [result, setResult] = useState(null);
+
+  const monthNames = [
+    "", "January", "February", "March", "April",
+    "May", "June", "July", "August",
+    "September", "October", "November", "December"
+  ];
+
+  const dayNames = [
+    "Sunday", "Monday", "Tuesday",
+    "Wednesday", "Thursday", "Friday", "Saturday"
+  ];
+
+  function formatValue(val, colName) {
+    if (val === null) return "NULL";
+    
+    const col = colName.toLowerCase();
+    
+    if (col.includes("monthname")) {
+      return monthNames[parseInt(val)];
+    }
+  
+    if (col.includes("dayname")) {
+      return dayNames[parseInt(val)];
+    }
+  
+    return val;
+  }
 
   useEffect(() => {
     const run = async () => {
       const db = await getDB();
 
       try {
-        const res = db.exec(query);
+        // const res = db.exec(query);
+        const transformed = transformQuery(query);
+        const res = db.exec(transformed);
+
         if (res.length > 0) {
           setResult(res[0]);
         }
@@ -42,7 +73,8 @@ export default function QueryTable({ query }) {
             <tr key={i} className="odd:bg-red-600/20 text-center">
               {row.map((cell, j) => (
                 <td key={j} className="px-2.5 py-2 border">
-                  {cell === null ? "NULL" : cell}
+                  {/* {cell === null ? "NULL" : cell} */}
+                  {formatValue(cell, result.columns[j])}
                 </td>
               ))}
             </tr>

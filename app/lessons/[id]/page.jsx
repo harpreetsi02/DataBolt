@@ -140,6 +140,15 @@ export default async function LessonPage({ params }) {
                           <h2 className="text-xl font-semibold text-red-500 mb-3">
                             {block.title}
                           </h2>
+
+                          <p className="text-gray-300 mb-4">
+                            {block.subtitle}
+                          </p>
+                          
+                          <p className="text-red-500 flex items-center gap-2">
+                            <i className="ri-send-plane-2-fill"></i>
+                            {block.queryName}
+                          </p>
                         
                           <div className="overflow-x-auto">
                             <table className="w-full text-sm whitespace-nowrap">

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { getDB } from "@/lib/initDB";
+import { transformQuery } from "@/lib/sqlTransformer";
 
 export default function SqlEditor({ tasks = [], questions = [], lessonId, exerciseName, defaultQuery }) {
   const [query, setQuery] = useState("");
@@ -35,7 +36,10 @@ export default function SqlEditor({ tasks = [], questions = [], lessonId, exerci
     const q = customQuery || query;
   
     try {
-      const res = db.exec(q);
+      // ----> agar koi problem hui toh iske niche ke dono cut krne hai <-----
+      // const res = db.exec(q); 
+      const transformed = transformQuery(q);
+      const res = db.exec(transformed);
   
       if (res.length > 0) {
         setResult(res[0]);
