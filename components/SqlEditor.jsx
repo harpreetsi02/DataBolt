@@ -141,7 +141,7 @@ export default function SqlEditor({ tasks = [], questions = [], lessonId, exerci
                     }
                 }
             }}
-            className="w-full h-32 p-3 bg-black text-green-400 font-mono rounded"
+            className="w-full min-h-60 resize-y p-3 bg-black text-green-400 font-mono rounded"
           />
 
           <button
@@ -156,38 +156,39 @@ export default function SqlEditor({ tasks = [], questions = [], lessonId, exerci
 
       {/* RIGHT SIDE TASK PANEL */}
       {/* <div className="p-4 bg-gray-900 rounded-xl"> */}
-      <div className="p-4 bg-gray-900 rounded-xl h-full max-h-[calc(100vh-300px)] overflow-y-auto">
-        <h2 className="text-lg font-bold mb-3">Tasks</h2>
+      <div className="p-4 flex flex-col justify-between bg-gray-900 rounded-xl h-full max-h-[calc(100vh-420px)] overflow-y-auto">
+        <div>
+          <h2 className="text-lg font-bold mb-3">Tasks</h2>
 
-        {questions.map((q, i) => (
-          <div
-            key={i}
-            className={`p-2 text-sm flex gap-2 items-center  ${
-              i === taskIndex
-                ? "text-blue-400"
-                : i < taskIndex
-                ? "text-green-400"
-                : "text-gray-500"
-            }`}
+          {questions.map((q, i) => (
+            <div
+              key={i}
+              className={`p-2 text-sm flex gap-2 items-center  ${
+                i === taskIndex
+                  ? "text-blue-400"
+                  : i < taskIndex
+                  ? "text-green-400"
+                  : "text-gray-500"
+              }`}
+            >
+              <span className="w-6">{i + 1}.</span>
+              {i < taskIndex && "✅"}
+              {i === taskIndex && "👉"}
+              {i > taskIndex && "•"}
+
+              {q}
+            </div>
+          ))}
+        </div>
+        <div className="mt-4 pb-6 text-sm text-center text-gray-400">
+          Stuck? Read this task's{" "}
+          <button
+            onClick={showSolution}
+            className="text-blue-400 underline"
           >
-            <span className="w-6">{i + 1}.</span>
-            {i < taskIndex && "✅"}
-            {i === taskIndex && "👉"}
-            {i > taskIndex && "•"}
-
-            {q}
-          </div>
-          
-        ))}
-      </div>
-      <div className="mt-4 text-sm text-center text-gray-400">
-        Stuck? Read this task's{" "}
-        <button
-          onClick={showSolution}
-          className="text-blue-400 underline"
-        >
-          Solution
-        </button>
+            Solution
+          </button>
+        </div>    
       </div>
     </div>
   );
