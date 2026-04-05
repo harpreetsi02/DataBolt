@@ -2241,61 +2241,60 @@ ORDER BY total_spent DESC;`, //50
           ],
           questions: [
             // Section A — Beginner
-            "List all employees with their department and salary.",
-            "Show only the name and hire_date of every employee.",
-            "Find all employees in the 'Sales' department.",
-            "List all products with price under 1000.",
-            "Find all customers from India.",
-            "Show employees hired after 2021-02-01.",
-            "List all distinct product categories.",
-            "Find orders with status = 'pending'.",
-            "Find employees whose name starts with 'A'.",
-            "Find products that are out of stock (stock = 0).",
-            "List all employees sorted by salary — highest first.",
-            "Show the top 3 most expensive products.",
-            "Find employees with salary between ₹60,000 and ₹80,000.",
-            "List employees NOT in the 'IT' department.",
-            "Find employees who have a manager (manager_id is not null).",
+            "List all employees with their department and salary.", //01
+            "Show only the name and hire_date of every employee.", //02
+            "Find all employees in the 'Sales' department.", //03
+            "List all products with price under ₹1,000.", //04
+            "Find all customers from India.", //05
+            "Show employees hired after 2022-01-01.", //06
+            "List all distinct product categories.", //07
+            "Find orders with status = 'pending'.", //08
+            "Find employees whose name starts with 'A'.", //09
+            "Find products that are out of stock (stock = 0).", //10
+            "List all employees sorted by salary — highest first.", //11
+            "Show the top 3 most expensive products.", //12
+            "Find employees with salary between ₹60,000 and ₹80,000.", //13
+            "List employees NOT in the 'IT' department.", //14
+            "Find employees who have a manager (manager_id is not null).", //15
 
             // Section B — Intermediate
-            "Count how many employees are in each department.",
-            "What is the average salary per department, ordered highest first?",
-            "Which department has the highest total payroll?",
-            "How many orders has each customer placed? (include customers with 0 orders)",
-            "What is the total revenue from all completed orders?",
-
-            "Show each employee's name and their manager's name.",
-            "Which customers have placed at least one order?",
-            "Which customers have NEVER placed an order?",
-            "Show each order with the customer name.",
-            "List each order item with customer name, product name, qty, unit price.",
-            "Find products that have been ordered at least once.",
-            "Find products that have NEVER been ordered.",
-            "Show total revenue per customer, highest first.",
-            "Which month had the highest revenue in 2024?",
-            "Find employees earning more than the overall average salary.",
-            "Find employees earning more than their own department average.",
-            "Show departments with more than 2 employees.",
-            "Get the 2nd highest salary in the company.",
-            "List all January 2024 orders placed by Indian customers.",
-            "Find customers who placed orders in both January AND February 2024.",
+            "Count how many employees are in each department.", //16
+            "What is the average salary per department, ordered highest first?", //17
+            "Which department has the highest total payroll?", //18
+            "How many orders has each customer placed? (include customers with 0 orders)", //19
+            "What is the total revenue from all completed orders?", //20
+            "Show each employee's name and their manager's name.", //21
+            "Which customers have placed at least one order?", //22
+            "Which customers have NEVER placed an order?", //23
+            "Show each order with the customer name.", //24
+            "List each order item with customer name, product name, qty, unit price.", //25
+            "Find products that have been ordered at least once.", //26
+            "Find products that have NEVER been ordered.", //27
+            "Show total revenue per customer, highest first.", //28
+            "Which month had the highest revenue in 2024?", //29
+            "Find employees earning more than the overall average salary.", //30
+            "Find employees earning more than their own department average.", //31
+            "Show departments with more than 2 employees.", //32
+            "Get the 2nd highest salary in the company.", //33
+            "List all January 2024 orders placed by Indian customers.", //34
+            "Find customers who placed orders in both January AND February 2024.", //35
 
             // Section C — Advanced
-            "Rank employees within each department by salary (highest = rank 1).",
-            "Show only the top earner per department.",
-            "Show a running cumulative total of order amounts by date.",
-            "For each order, show the previous order's total (LAG).",
-            "Calculate month-over-month revenue change (absolute + % change) for 2024.",
-            "Show each order's total as a percentage of the company's total revenue.",
-            "Label each customer as VIP (>₹1,00,000), Regular (>₹10,000), or New.",
-            "Find which product has generated the most total revenue.",
-            "Show all employees with their full hierarchy level (recursive CTE).",
-            "Show product category revenue and each category's % share of total.",
-            "For each employee, show their salary rank within the company (NTILE quartile).",
-            "Show the 3-month moving average of monthly revenue.",
-            "Find which day of the week has the most orders.",
-            "Show each order with a 'streak number' — consecutive orders by the same customer.",
-            "Build a complete customer health report: name, total orders, total spent, avg order value, days since first order, days since last order."
+            "Rank employees within each department by salary (highest = rank 1).", //36
+            "Show only the top earner per department.", //37
+            "Show a running cumulative total of order amounts by date.", //38
+            "For each order, show the previous order's total (LAG).", //39
+            "Calculate month-over-month revenue change (absolute + % change) for 2024.", //40
+            "Show each order's total as a percentage of the company's total revenue.", //41
+            "Label each customer as VIP (>₹1,00,000), Regular (>₹10,000), or New.", //42
+            "Find which product has generated the most total revenue.", //43
+            "Show all employees with their full hierarchy level (recursive CTE).", //44
+            "Show product category revenue and each category's % share of total.", //45
+            "For each employee, show their salary rank within the company (NTILE quartile).", //46
+            "Show the 3-month moving average of monthly revenue.", //47
+            "Find which day of the week has the most orders.", //48
+            "Show each order with a 'streak number' — consecutive orders by the same customer.", //49
+            "Build a complete customer health report: name, total orders, total spent, avg order value, days since first order, days since last order." //50
           ]
         }
       ]

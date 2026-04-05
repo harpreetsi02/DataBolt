@@ -47,6 +47,7 @@ export default function SqlEditor({ tasks = [], questions = [], lessonId, exerci
         // show updated table
         const res = db.exec("SELECT * FROM employees");
       
+
         if (res.length > 0) {
           setResult(res[0]);
         }

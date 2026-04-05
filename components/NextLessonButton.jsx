@@ -1,5 +1,6 @@
 "use client";
 
+import { lessons } from "@/data/lessons";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import 'remixicon/fonts/remixicon.css'
@@ -8,6 +9,14 @@ export default function NextLessonButton({ currentId, lesson }) {
 
   const router = useRouter();
   const [canProceed, setCanProceed] = useState(true);
+
+  const current = parseInt(currentId, 10);
+  const isLastLesson = current >= lessons.length;
+
+  // ✅ sabse pehle check
+  if (isLastLesson) {
+    return null;
+  }
 
   useEffect(() => {
 
