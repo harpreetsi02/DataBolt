@@ -28,5 +28,4 @@ export const lessons = [
   { id: 25, title: "SQL Execution Order" },
 
   { id: 26, title: "50 Practice Problems" },
-  { id: 27, title: "Answer Key" },
 ];

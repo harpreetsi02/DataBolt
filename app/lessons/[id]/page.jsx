@@ -258,10 +258,15 @@ export default async function LessonPage({ params }) {
 
                 if (block.type === "noteBlue") {
                   return (
-                    <div key={i} className="bg-blue-100 border-l-4 mb-5 border-blue-600 p-4 rounded">
+                    <div key={i}>
+                      <p className="text-gray-300 mb-4">
+                          {block.subtitle}
+                      </p>
+                      <div className="bg-blue-100 border-l-4 mb-5 border-blue-600 p-4 rounded">
                         <p className="text-sm text-blue-800">
                         🌟 <span className="font-bold text-blue-900">{block.heading}</span> {block.explanation}
                         </p>
+                      </div>
                     </div>
                   );
                 }

@@ -1706,28 +1706,28 @@ DELETE FROM employees WHERE salary < 50000;          -- then delete`
           tasks: [
             "INSERT INTO employees VALUES (9, 'Rohit', 'IT', 75000, 1, '2024-01-10');",
           
-            "INSERT INTO employees (emp_id, name, department, salary, manager_id, hire_date) VALUES (10, 'Neha', 'HR', 62000, 4, '2023-12-01');",
-          
             "UPDATE employees SET salary = 80000 WHERE name = 'Priya';",
           
             "UPDATE employees SET department = 'Marketing' WHERE emp_id = 3;",
           
             "DELETE FROM employees WHERE emp_id = 8;",
           
+            "INSERT INTO employees (emp_id, name, department, salary, manager_id, hire_date) VALUES (10, 'Neha', 'HR', 62000, 4, '2023-12-01');",
+          
             "DELETE FROM employees WHERE department = 'HR';"
           ],
           questions: [
-            "Insert a new employee named Rohit into the employees table.",
-          
-            "Insert a new employee Neha by specifying column names explicitly.",
+            "Insert a new employee Rohit into the table.",
           
             "Update Priya's salary to 80000.",
           
-            "Change Rahul's department to Marketing using emp_id.",
+            "Change Rahul's department to Marketing.",
           
-            "Delete the employee whose emp_id is 8.",
+            "Delete the employee with emp_id 8.",
           
-            "Delete all employees who belong to the HR department."
+            "Insert a new employee Neha using column names.",
+          
+            "Delete all employees from HR department."
           ]
         }
       ]
@@ -1948,6 +1948,355 @@ SELECT salary * 12 AS annual FROM employees ORDER BY annual DESC;`
           type: "noteGreen",
           heading: "Interview Tips:",
           explanation: "Why can't I use a SELECT alias in a WHERE clause?' is a common interview screening question. It filters candidates who have merely memorised syntax from those who understand how SQL actually executes."
+        }
+      ]
+    },
+
+    26: {
+      title: "50 Practice",
+      highlight: "Problems",
+      subtitle: "Build real query muscle — from beginner to FAANG-ready.",
+
+      points: [
+          "Section A (Q1 - 15): Beginner - single table, basic filters",
+          "Section B (Q16 - 35): Intermediate — JOINs, GROUP BY, subqueries",
+          "Section C (Q36 - 50): Advanced — window functions, CTEs, analytics"
+      ],
+
+      blocks: [
+        {
+          type: "noteBlue",
+          subtitle: "All problems use our five tables: employees, products, customers, orders, order_items.",
+          heading: "Note",
+          explanation: "Attempt each question before looking at the Answer Key. Struggling and figuring out the answer yourself is 10x more effective than reading the solution directly."
+        },
+
+        {
+          type: "multipleTable",
+          data: [
+            {
+              title: "Employees",
+              data: dbTables.employees
+            },
+            {
+              title: "Order Items",
+              data: dbTables.order_items
+            },
+            {
+              title: "Orders",
+              data: dbTables.orders
+            },
+            {
+              title: "Products",
+              data: dbTables.products
+            },
+            {
+              title: "Customers",
+              data: dbTables.customers
+            },
+          ]
+        },
+
+        {
+          type: "exercise",
+          exersiceName: "Table: (Employees, Order Items, Orders, Products, Customers)",
+          tasks: [
+
+            // Section A - Beginner (Q1 - Q15)
+            "SELECT name, department, salary FROM employees;", //01
+            "SELECT name, hire_date FROM employees;", //02
+            "SELECT * FROM employees WHERE department = 'Sales';", //03
+            "SELECT name, price FROM products WHERE price < 1000;", //04
+            "SELECT * FROM customers WHERE country = 'India';", //05
+            "SELECT name, hire_date FROM employees WHERE hire_date > '2022-01-01';", //06
+            "SELECT DISTINCT category FROM products;", //07
+            "SELECT * FROM orders WHERE status = 'pending';", //08
+            "SELECT name FROM employees WHERE name LIKE 'A%';", //09
+            "SELECT name, stock FROM products WHERE stock = 0;", //10
+            "SELECT name, salary FROM employees ORDER BY salary DESC;", //11
+            "SELECT name, price FROM products ORDER BY price DESC LIMIT 3;", //12
+            "SELECT name, salary FROM employees WHERE salary BETWEEN 60000 AND 80000;", //13
+            "SELECT name, department FROM employees WHERE department != 'IT';", //14                    
+            "SELECT name, manager_id FROM employees WHERE manager_id IS NOT NULL;", //15
+
+            // Section B - Intermediate (Q16 - Q35)
+            "SELECT department, COUNT(*) AS headcount FROM employees GROUP BY department ORDER BY headcount DESC;", //16
+            "SELECT department, ROUND(AVG(salary), 2) AS avg_salary FROM employees GROUP BY department ORDER BY avg_salary DESC;", //17
+                    
+            "SELECT department, SUM(salary) AS total_payroll FROM employees GROUP BY department ORDER BY total_payroll DESC LIMIT 1;", //18
+                    
+            "SELECT c.name, COUNT(o.order_id) AS order_count FROM customers c LEFT JOIN orders o ON c.customer_id = o.customer_id GROUP BY c.customer_id, c.name ORDER BY order_count DESC;", //19
+                    
+            "SELECT SUM(total) AS completed_revenue FROM orders WHERE status = 'completed';", //20/
+                    
+            "SELECT e.name AS employee, m.name AS manager FROM employees e LEFT JOIN employees m ON e.manager_id = m.emp_id ORDER BY e.name;", //21
+                    
+            "SELECT DISTINCT c.name FROM customers c INNER JOIN orders o ON c.customer_id = o.customer_id;", //22
+                    
+            "SELECT c.name FROM customers c LEFT JOIN orders o ON c.customer_id = o.customer_id WHERE o.order_id IS NULL;",//23
+                    
+            "SELECT c.name, o.order_id, o.order_date, o.total, o.status FROM orders o JOIN customers c ON o.customer_id = c.customer_id ORDER BY o.order_date;", //24
+                    
+            `SELECT c.name AS customer, o.order_date, p.name AS product, oi.qty,
+oi.unit_price
+FROM order_items oi
+JOIN orders o ON oi.order_id = o.order_id
+JOIN customers c ON o.customer_id = c.customer_id
+JOIN products p ON oi.product_id = p.product_id
+ORDER BY o.order_date;`, //25 
+                    
+            `SELECT DISTINCT p.name
+FROM products p
+INNER JOIN order_items oi ON p.product_id = oi.product_id;`, //26
+                    
+            `SELECT p.name
+FROM products p
+LEFT JOIN order_items oi ON p.product_id = oi.product_id
+WHERE oi.item_id IS NULL;`, //27
+                    
+            `SELECT c.name, SUM(o.total) AS total_spent
+FROM customers c
+JOIN orders o ON c.customer_id = o.customer_id
+GROUP BY c.customer_id, c.name
+ORDER BY total_spent DESC;`, //28
+                    
+            `SELECT MONTHNAME(order_date) AS month, SUM(total) AS revenue
+FROM orders
+WHERE YEAR(order_date) = 2024
+GROUP BY MONTH(order_date), MONTHNAME(order_date)
+ORDER BY revenue DESC
+LIMIT 1;`, //29
+
+            `SELECT name, salary
+FROM employees
+WHERE salary > (SELECT AVG(salary) FROM employees)
+ORDER BY salary DESC;`, //30
+                    
+            `WITH dept_avg AS (
+ SELECT department, AVG(salary) AS avg_sal
+ FROM employees
+ GROUP BY department
+)
+SELECT e.name, e.department, e.salary, d.avg_sal
+FROM employees e
+JOIN dept_avg d ON e.department = d.department
+WHERE e.salary > d.avg_sal;`,  //31
+                    
+            `SELECT department, COUNT(*) AS headcount
+FROM employees
+GROUP BY department
+HAVING COUNT(*) > 2;`, //32
+                    
+            `WITH ranked AS (
+ SELECT salary, DENSE_RANK() OVER (ORDER BY salary DESC) AS rnk
+ FROM employees
+)
+SELECT DISTINCT salary AS second_highest
+FROM ranked WHERE rnk = 2;`, //33 with two type solution
+                    
+            `SELECT c.name, o.order_id, o.order_date, o.total
+FROM orders o
+JOIN customers c ON o.customer_id = c.customer_id
+WHERE YEAR(o.order_date) = 2024
+ AND MONTH(o.order_date) = 1
+ AND c.country = 'India';`, //34
+                    
+            `SELECT customer_id
+FROM orders
+WHERE YEAR(order_date) = 2024 AND MONTH(order_date) = 1
+AND customer_id IN (
+ SELECT customer_id FROM orders
+ WHERE YEAR(order_date) = 2024 AND MONTH(order_date) = 2
+);`, //35
+
+            // Section C - Advanced (Q36 - Q50)
+            `SELECT name, department, salary,
+ RANK() OVER (PARTITION BY department ORDER BY salary DESC) AS
+dept_rank
+FROM employees
+ORDER BY department, dept_rank;`, //36
+                    
+            `WITH ranked AS (
+ SELECT *,
+ ROW_NUMBER() OVER (PARTITION BY department ORDER BY salary
+DESC) AS rn
+ FROM employees
+)
+SELECT name, department, salary FROM ranked WHERE rn = 1;`, //37
+                    
+            `SELECT order_id, order_date, total,
+ SUM(total) OVER (ORDER BY order_date
+ ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+ ) AS running_total
+FROM orders;`, //38
+                    
+            `SELECT order_id, order_date, total,
+ LAG(total, 1, 0) OVER (ORDER BY order_date) AS prev_total
+FROM orders;`, //39
+                    
+            `WITH monthly AS (
+ SELECT MONTH(order_date) AS mo, MONTHNAME(order_date) AS
+month_name,
+ SUM(total) AS revenue
+ FROM orders WHERE YEAR(order_date) = 2024
+ GROUP BY MONTH(order_date), MONTHNAME(order_date)
+)
+SELECT month_name, revenue,
+ revenue - LAG(revenue) OVER (ORDER BY mo) AS abs_change,
+ ROUND(100.0 * (revenue - LAG(revenue) OVER (ORDER BY mo))
+ / LAG(revenue) OVER (ORDER BY mo), 1) AS pct_change
+FROM monthly ORDER BY mo;`, //40
+                    
+            `SELECT order_id, total,
+ ROUND(100.0 * total / SUM(total) OVER (), 2) AS pct_of_total
+FROM orders
+ORDER BY pct_of_total DESC;`, //41
+                    
+            `WITH totals AS (
+ SELECT customer_id, SUM(total) AS spent FROM orders GROUP BY
+customer_id
+)
+SELECT c.name, t.spent,
+ CASE WHEN t.spent > 100000 THEN 'VIP'
+ WHEN t.spent > 10000 THEN 'Regular'
+ ELSE 'New'
+ END AS tier
+FROM customers c
+JOIN totals t ON c.customer_id = t.customer_id
+ORDER BY t.spent DESC;`, //42
+                    
+            `SELECT p.name, SUM(oi.qty * oi.unit_price) AS revenue
+FROM products p
+JOIN order_items oi ON p.product_id = oi.product_id
+GROUP BY p.product_id, p.name
+ORDER BY revenue DESC
+LIMIT 1;`, //43
+                    
+            `WITH RECURSIVE hierarchy AS (
+ SELECT emp_id, name, manager_id, 1 AS level, name AS path
+ FROM employees WHERE manager_id IS NULL
+
+ UNION ALL
+
+ SELECT e.emp_id, e.name, e.manager_id,
+ h.level + 1, CONCAT(h.path, ' → ', e.name)
+ FROM employees e
+ JOIN hierarchy h ON e.manager_id = h.emp_id
+)
+SELECT name, level, path FROM hierarchy ORDER BY path;`, //44
+                    
+            `SELECT p.category,
+ SUM(oi.qty * oi.unit_price) AS revenue,
+ ROUND(100.0 * SUM(oi.qty * oi.unit_price) / SUM(SUM(oi.qty *
+oi.unit_price)) OVER (), 1) AS pct
+FROM products p
+JOIN order_items oi ON p.product_id = oi.product_id
+GROUP BY p.category
+ORDER BY revenue DESC;`, //45
+                    
+            `SELECT name, salary,
+ NTILE(4) OVER (ORDER BY salary) AS quartile,
+ NTILE(100) OVER (ORDER BY salary) AS percentile
+FROM employees
+ORDER BY salary;`, //46
+                    
+            `WITH monthly AS (
+ SELECT MONTH(order_date) AS mo, SUM(total) AS revenue
+ FROM orders WHERE YEAR(order_date) = 2024
+ GROUP BY MONTH(order_date)
+)
+SELECT mo, revenue,
+ ROUND(AVG(revenue) OVER (
+ ORDER BY mo
+ ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
+ ), 2) AS moving_avg_3m
+FROM monthly ORDER BY mo;`, //47
+                    
+            `SELECT DAYNAME(order_date) AS day_of_week,
+ COUNT(*) AS order_count
+FROM orders
+GROUP BY DAYOFWEEK(order_date), DAYNAME(order_date)
+ORDER BY order_count DESC
+LIMIT 1;`, //48
+                    
+            `SELECT order_id, customer_id, order_date,
+ ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY order_date)
+AS order_sequence
+FROM orders
+ORDER BY customer_id, order_date;`, //49
+                    
+            `SELECT
+ c.name,
+ COUNT(o.order_id) AS total_orders,
+ COALESCE(SUM(o.total), 0) AS total_spent,
+ ROUND(AVG(o.total), 2) AS avg_order_value,
+ MIN(o.order_date) AS first_order,
+ MAX(o.order_date) AS last_order,
+ DATEDIFF(CURDATE(), MIN(o.order_date)) AS days_since_first,
+ DATEDIFF(CURDATE(), MAX(o.order_date)) AS days_since_last
+FROM customers c
+LEFT JOIN orders o ON c.customer_id = o.customer_id
+GROUP BY c.customer_id, c.name
+ORDER BY total_spent DESC;`, //50
+          ],
+          questions: [
+            // Section A — Beginner
+            "List all employees with their department and salary.",
+            "Show only the name and hire_date of every employee.",
+            "Find all employees in the 'Sales' department.",
+            "List all products with price under 1000.",
+            "Find all customers from India.",
+            "Show employees hired after 2021-02-01.",
+            "List all distinct product categories.",
+            "Find orders with status = 'pending'.",
+            "Find employees whose name starts with 'A'.",
+            "Find products that are out of stock (stock = 0).",
+            "List all employees sorted by salary — highest first.",
+            "Show the top 3 most expensive products.",
+            "Find employees with salary between ₹60,000 and ₹80,000.",
+            "List employees NOT in the 'IT' department.",
+            "Find employees who have a manager (manager_id is not null).",
+
+            // Section B — Intermediate
+            "Count how many employees are in each department.",
+            "What is the average salary per department, ordered highest first?",
+            "Which department has the highest total payroll?",
+            "How many orders has each customer placed? (include customers with 0 orders)",
+            "What is the total revenue from all completed orders?",
+
+            "Show each employee's name and their manager's name.",
+            "Which customers have placed at least one order?",
+            "Which customers have NEVER placed an order?",
+            "Show each order with the customer name.",
+            "List each order item with customer name, product name, qty, unit price.",
+            "Find products that have been ordered at least once.",
+            "Find products that have NEVER been ordered.",
+            "Show total revenue per customer, highest first.",
+            "Which month had the highest revenue in 2024?",
+            "Find employees earning more than the overall average salary.",
+            "Find employees earning more than their own department average.",
+            "Show departments with more than 2 employees.",
+            "Get the 2nd highest salary in the company.",
+            "List all January 2024 orders placed by Indian customers.",
+            "Find customers who placed orders in both January AND February 2024.",
+
+            // Section C — Advanced
+            "Rank employees within each department by salary (highest = rank 1).",
+            "Show only the top earner per department.",
+            "Show a running cumulative total of order amounts by date.",
+            "For each order, show the previous order's total (LAG).",
+            "Calculate month-over-month revenue change (absolute + % change) for 2024.",
+            "Show each order's total as a percentage of the company's total revenue.",
+            "Label each customer as VIP (>₹1,00,000), Regular (>₹10,000), or New.",
+            "Find which product has generated the most total revenue.",
+            "Show all employees with their full hierarchy level (recursive CTE).",
+            "Show product category revenue and each category's % share of total.",
+            "For each employee, show their salary rank within the company (NTILE quartile).",
+            "Show the 3-month moving average of monthly revenue.",
+            "Find which day of the week has the most orders.",
+            "Show each order with a 'streak number' — consecutive orders by the same customer.",
+            "Build a complete customer health report: name, total orders, total spent, avg order value, days since first order, days since last order."
+          ]
         }
       ]
     }

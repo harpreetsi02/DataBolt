@@ -16,12 +16,13 @@ export const dbTables = {
   products: {
     headers: ["product_id", "name", "category", "price", "stock"],
     rows: [
-      [1, "iPhone", "Electronics", 79999, 50],
+      [1, "iPhone 15", "Electronics", 79999, 50],
       [2, "SQL Book", "Books", 499, 200],
       [3, "Headphones", "Electronics", 2999, 75],
       [4, "Notebook", "Stationery", 99, 500],
       [5, "Laptop", "Electronics", 65000, 20],
-      [6, "Pen Set", "Stationery", 149, 0]
+      [6, "Pen Set", "Stationery", 149, 0],
+      [7, "Mouse", "Electronics", 599, 25],
     ]
   },
 

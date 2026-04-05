@@ -34,17 +34,40 @@ export default function SqlEditor({ tasks = [], questions = [], lessonId, exerci
   const runQuery = async (customQuery) => {
     const db = await getDB();
     const q = customQuery || query;
-  
+    
     try {
-      // ----> agar koi problem hui toh iske niche ke dono cut krne hai <-----
-      // const res = db.exec(q); 
       const transformed = transformQuery(q);
+    
+      const isMutation = /^(insert|update|delete)/i.test(q.trim());
+    
+      // 🔥 run main query
+      db.exec(transformed);
+    
+      if (isMutation) {
+        // show updated table
+        const res = db.exec("SELECT * FROM employees");
+      
+        if (res.length > 0) {
+          setResult(res[0]);
+        }
+      
+        // ✅ task check (simple match)
+        if (
+          tasks[taskIndex] &&
+          normalizeQuery(q) === normalizeQuery(tasks[taskIndex])
+        ) {
+          setTaskIndex(taskIndex + 1);
+        }
+      
+        return;
+      }
+    
+      // SELECT queries
       const res = db.exec(transformed);
-  
+    
       if (res.length > 0) {
         setResult(res[0]);
       
-        // ✅ task check
         if (
           tasks[taskIndex] &&
           normalizeQuery(q) === normalizeQuery(tasks[taskIndex])
@@ -52,9 +75,12 @@ export default function SqlEditor({ tasks = [], questions = [], lessonId, exerci
           setTaskIndex(taskIndex + 1);
         }
       }
+    
     } catch (err) {
-      // 🔥 SILENT FAIL (most important)
-      return;
+      setResult({
+        columns: ["Error"],
+        values: [[err.message]]
+      });
     }
   };
   
@@ -128,7 +154,8 @@ export default function SqlEditor({ tasks = [], questions = [], lessonId, exerci
       </div>
 
       {/* RIGHT SIDE TASK PANEL */}
-      <div className="p-4 bg-gray-900 rounded-xl">
+      {/* <div className="p-4 bg-gray-900 rounded-xl"> */}
+      <div className="p-4 bg-gray-900 rounded-xl h-full max-h-[calc(100vh-300px)] overflow-y-auto">
         <h2 className="text-lg font-bold mb-3">Tasks</h2>
 
         {questions.map((q, i) => (
@@ -142,6 +169,7 @@ export default function SqlEditor({ tasks = [], questions = [], lessonId, exerci
                 : "text-gray-500"
             }`}
           >
+            <span className="w-6">{i + 1}.</span>
             {i < taskIndex && "✅"}
             {i === taskIndex && "👉"}
             {i > taskIndex && "•"}
