@@ -58,7 +58,10 @@ export default function Navbar() {
               {lessons.map((l) => (
                 <div
                   key={l.id}
-                  onClick={() => router.push(`/lessons/${l.id}`)}
+                  onClick={() => {
+                    setOpen(false); 
+                    router.push(`/lessons/${l.id}`)}
+                  }
                   className="text-red-500 hover:underline cursor-pointer text-sm md:text-lg"
                 >
                   {l.id === 1
