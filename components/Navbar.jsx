@@ -24,7 +24,7 @@ export default function Navbar() {
   };
 
   return (
-    <div className="w-full backdrop-blur-md shadow-gray-800 shadow-md fixed top-0 left-0 z-50 bg-[#0f172a] text-white px-12 md:px-20 py-6 flex justify-between items-center border-b border-gray-800">
+    <div className="w-full backdrop-blur-md shadow-gray-800 shadow-md fixed top-0 left-0 z-50 bg-[#0f172a] text-white px-8 md:px-20 py-4 md:py-6 flex justify-between items-center border-b border-gray-800">
 
       {/* LEFT - LOGO */}
       <h1
@@ -46,7 +46,7 @@ export default function Navbar() {
 
         {/* DROPDOWN */}
         {open && (
-          <div className="absolute right-0 mt-2 w-125 bg-gray-800 text-black rounded shadow-lg p-4">
+          <div className="absolute right-0 mt-2 w-80 md:w-125 bg-gray-800 text-black rounded shadow-lg p-4">
         
             <h2 className="text-gray-200 mb-2 font-semibold">
               All Lessons
