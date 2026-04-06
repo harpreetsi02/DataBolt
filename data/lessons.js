@@ -8,8 +8,8 @@ export const lessons = [
   { id: 7, title: "NULL — The Mystery Value" },
   { id: 8, title: "ORDER BY" },
   { id: 9, title: "LIMIT & OFFSET" },
-
   { id: 10, title: "Aggregate Functions" },
+
   { id: 11, title: "GROUP BY" },
   { id: 12, title: "HAVING" },
   { id: 13, title: "INNER JOINs" },
@@ -20,8 +20,8 @@ export const lessons = [
   { id: 18, title: "Joining Multiple Tables" },
   { id: 19, title: "Subqueries" },
   { id: 20, title: "CTEs (WITH)" },
-  { id: 21, title: "CASE Statements" },
 
+  { id: 21, title: "CASE Statements" },
   { id: 22, title: "Window Functions" },
   { id: 23, title: "String Functions" },
   { id: 24, title: "Date & Time Functions" },
@@ -30,6 +30,5 @@ export const lessons = [
   { id: 27, title: "Indexes & Performance" },
   { id: 28, title: "Transactions & ACID" },
   { id: 29, title: "SQL Execution Order" },
-
   { id: 30, title: "50 Practice Problems" },
 ];
