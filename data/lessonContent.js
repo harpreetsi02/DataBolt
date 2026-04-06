@@ -829,7 +829,8 @@ HAVING COUNT(*) > 2;`,
     },
 
     13: {
-      title: "JOINs",
+      title: "INNER",
+      highlight: "JOINs",
       subtitle: "Aggregating by category — the analytics workhorse.",
 
       points: [
@@ -862,49 +863,21 @@ ORDER BY c.name, o.order_id;`,
 
         {
           type: "queryTable",
-          title: "13.2 - LEFT JOIN",
-          subtitle: "Returns ALL rows from the left table (customers). Unmatched rows show NULL on the right side.",
+          title: "13.2 - INNER JOIN (Customers with High Orders)",
+          subtitle: "Find customers and their order details only for orders greater than 3000. This shows how INNER JOIN works with filtering conditions.",
           queryName: "SQL",
           code: `SELECT c.name, o.order_id, o.total
 FROM customers c
-LEFT JOIN orders o ON c.customer_id = o.customer_id
-ORDER BY c.name;`,
-          data: dbTables.customers
-        },
-
-        {
-          type: "queryTable",
-          title: "13.3 - Find Customers Who Never Ordered",
-          queryName: "Classic LEFT JOIN + IS NULL patter",
-          code: `SELECT c.name
-FROM customers c
-LEFT JOIN orders o ON c.customer_id = o.customer_id
-WHERE o.order_id IS NULL;`,
+INNER JOIN orders o
+ON c.customer_id = o.customer_id
+WHERE o.total > 3000;`,
           data: dbTables.customers
         },
 
         {
           type: "noteGreen",
-          heading: "Pro Tips:",
-          explanation: "This pattern — LEFT JOIN + WHERE right_side IS NULL — is one of the most frequently used patterns in analytics. 'Users who signed up but never purchased', 'products never sold', 'employees not assigned to any project'."
-        },
-
-        {
-          type: "queryTable",
-          title: "13.4 - SELF JOIN",
-          subtitle: "A table joined to itself. Our employees table has manager_id referencing emp_id in the same table: ",
-          queryName: "Employees + their manager's name",
-          code: `SELECT e.name AS employee, m.name AS manager
-FROM employees e
-LEFT JOIN employees m ON e.manager_id = m.emp_id
-ORDER BY e.name;`,
-          data: dbTables.employees
-        },
-
-        {
-          type: "note",
-          heading: "Engineering Insight:",
-          explanation: "INNER JOIN vs LEFT JOIN is a decision, not a preference. Ask yourself: 'Is it valid for a row to have no match?' If yes, use LEFT JOIN. If a row must have a corresponding entry in the other table (by business rules), use INNER JOIN — it will surface data integrity issues."
+          heading: "Pro Tip:",
+          explanation: "This is commonly used in business to identify high-value customers."
         },
 
         {
@@ -926,24 +899,733 @@ ORDER BY e.name;`,
           exersiceName: "Tables: Customers",
           defaultQuery: "SELECT * FROM customers;",
           tasks: [
-            "SELECT customers.name, orders.total FROM customers INNER JOIN orders ON customers.customer_id = orders.customer_id;",
-            "SELECT customers.name, orders.order_date, orders.status FROM customers INNER JOIN orders ON customers.customer_id = orders.customer_id;",
-            "SELECT customers.name, orders.total FROM customers LEFT JOIN orders ON customers.customer_id = orders.customer_id;",
-            "SELECT customers.name, orders.total FROM customers INNER JOIN orders ON customers.customer_id = orders.customer_id WHERE orders.total > 50000;",
-            "SELECT customers.name, orders.status FROM customers INNER JOIN orders ON customers.customer_id = orders.customer_id WHERE orders.status = 'completed';"
+            `SELECT c.name, o.order_id
+FROM customers c
+INNER JOIN orders o
+ON c.customer_id = o.customer_id;`,
+
+            `SELECT c.name, o.total
+FROM customers c
+INNER JOIN orders o
+ON c.customer_id = o.customer_id;`,
+
+            `SELECT c.name, o.total
+FROM customers c
+INNER JOIN orders o
+ON c.customer_id = o.customer_id
+WHERE o.total > 5000;`,
+
+            `SELECT c.name, o.order_id
+FROM customers c
+INNER JOIN orders o
+ON c.customer_id = o.customer_id
+WHERE o.status = 'completed';`,
+
+            `SELECT c.name, o.total
+FROM customers c
+INNER JOIN orders o
+ON c.customer_id = o.customer_id
+ORDER BY o.total DESC;`,
+
+            `SELECT c.name, COUNT(o.order_id) AS total_orders
+FROM customers c
+INNER JOIN orders o
+ON c.customer_id = o.customer_id
+GROUP BY c.name;`,
+
+            `SELECT c.name, SUM(o.total) AS total_spent
+FROM customers c
+INNER JOIN orders o
+ON c.customer_id = o.customer_id
+GROUP BY c.name;`,
+
+            `SELECT c.name, COUNT(o.order_id) AS orders_count
+FROM customers c
+INNER JOIN orders o
+ON c.customer_id = o.customer_id
+GROUP BY c.name
+HAVING COUNT(o.order_id) > 1;`,
+
+            `SELECT c.name, MAX(o.order_date) AS last_order
+FROM customers c
+INNER JOIN orders o
+ON c.customer_id = o.customer_id
+GROUP BY c.name;`,
+
+            `SELECT c.name, AVG(o.total) AS avg_order
+FROM customers c
+INNER JOIN orders o
+ON c.customer_id = o.customer_id
+GROUP BY c.name;`,
+
+            `SELECT c.name, o.order_id, oi.qty
+FROM customers c
+INNER JOIN orders o ON c.customer_id = o.customer_id
+INNER JOIN order_items oi ON o.order_id = oi.order_id;`,
+
+            `SELECT c.name, p.name, oi.qty
+FROM customers c
+INNER JOIN orders o ON c.customer_id = o.customer_id
+INNER JOIN order_items oi ON o.order_id = oi.order_id
+INNER JOIN products p ON oi.product_id = p.product_id;`,
+
+            `SELECT p.name, SUM(oi.qty) AS total_qty
+FROM products p
+INNER JOIN order_items oi ON p.product_id = oi.product_id
+GROUP BY p.name;`,
+
+            `SELECT DISTINCT c.name
+FROM customers c
+INNER JOIN orders o ON c.customer_id = o.customer_id
+INNER JOIN order_items oi ON o.order_id = oi.order_id
+INNER JOIN products p ON oi.product_id = p.product_id
+WHERE p.category = 'Electronics';`,
+
+            `SELECT c.name, MAX(o.total) AS highest_order
+FROM customers c
+INNER JOIN orders o
+ON c.customer_id = o.customer_id
+GROUP BY c.name;`
           ],
           questions: [
-            "Show customer names along with their order totals.",
-            "Show customer names, order dates, and order status.",
-            "Show all customers and their order totals (including customers with no orders).",
-            "Find customers who have placed orders with total greater than 50000.",
-            "Find customers who have completed orders."
+            "Get customer names with their order IDs",
+            "Show order totals with customer names",
+            "Orders above 5000",
+            "Only completed orders",
+            "Sort by order amount",
+            "Count orders per customer",
+            "Total spending per customer",
+            "Customers with more than 1 order",
+            "Latest order date per customer",
+            "Average order value per customer",
+            "Join 3 tables (customers + orders + order_items)",
+            "Product names with customer orders",
+            "Total quantity ordered per product",
+            "Customers who bought Electronics",
+            "Highest order per customer"
           ],
         }
       ]
     },
 
     14: {
+      title: "LEFT",
+      highlight: "JOINs",
+      subtitle: "Keeping all left table rows — even when there is no match.",
+
+      points: [
+        "LEFT JOIN returns ALL rows from the left table",
+        "Matching rows from the right table are included",
+        "If no match is found, NULL values are returned",
+        "Useful to find missing relationships (e.g., customers with no orders)",
+        "LEFT JOIN + IS NULL helps detect unmatched records"
+      ],
+
+      blocks: [
+        {
+          type: "noteBlue",
+          heading: "Think of it this way:",
+          explanation: "You have a list of all customers and a list of orders. A LEFT JOIN ensures every customer appears — even if they never placed an order. Missing orders will show as NULL."
+        },
+      
+        {
+          type: "queryTable",
+          title: "14.1 - LEFT JOIN",
+          subtitle: "Returns ALL rows from the left table (customers). Unmatched rows show NULL on the right side.",
+          queryName: "SQL",
+          code: `SELECT c.name, o.order_id, o.total
+FROM customers c
+LEFT JOIN orders o ON c.customer_id = o.customer_id
+ORDER BY c.name;`,
+          data: dbTables.customers
+        },
+      
+        {
+          type: "queryTable",
+          title: "14.2 - Find Customers Who Never Ordered",
+          queryName: "Classic LEFT JOIN + IS NULL patter",
+          code: `SELECT c.name
+FROM customers c
+LEFT JOIN orders o ON c.customer_id = o.customer_id
+WHERE o.order_id IS NULL;`,
+          data: dbTables.customers
+        },
+
+        {
+          type: "noteGreen",
+          heading: "Pro Tips:",
+          explanation: "This pattern — LEFT JOIN + WHERE right_side IS NULL — is one of the most frequently used patterns in analytics. 'Users who signed up but never purchased', 'products never sold', 'employees not assigned to any project'."
+        },
+      
+        {
+          type: "noteGreen",
+          heading: "Pro Tip:",
+          explanation: "LEFT JOIN + IS NULL is widely used to find missing data — like users who never logged in, customers with no orders, or products that were never sold."
+        },
+
+        {
+          type: "multipleTable",
+          data: [
+            {
+              title: "customers",
+              data: dbTables.customers
+            },
+            {
+              title: "orders",
+              data: dbTables.orders
+            }
+          ]
+        },
+
+        {
+          type: "exercise",
+          exersiceName: "Tables: Customers",
+          defaultQuery: "SELECT * FROM customers;",
+          tasks: [
+              `SELECT c.name, o.order_id
+FROM customers c
+LEFT JOIN orders o
+ON c.customer_id = o.customer_id;`,
+
+              `SELECT c.name, o.total
+FROM customers c
+LEFT JOIN orders o
+ON c.customer_id = o.customer_id;`,
+
+              `SELECT c.name, o.total
+FROM customers c
+LEFT JOIN orders o
+ON c.customer_id = o.customer_id
+WHERE o.total > 5000;`,
+
+              `SELECT c.name, o.order_id
+FROM customers c
+LEFT JOIN orders o
+ON c.customer_id = o.customer_id
+WHERE o.status = 'completed';`,
+
+              `SELECT c.name, o.total
+FROM customers c
+LEFT JOIN orders o
+ON c.customer_id = o.customer_id
+ORDER BY o.total DESC;`,
+
+              `SELECT c.name, COUNT(o.order_id) AS total_orders
+FROM customers c
+LEFT JOIN orders o
+ON c.customer_id = o.customer_id
+GROUP BY c.name;`,
+
+              `SELECT c.name, SUM(o.total) AS total_spent
+FROM customers c
+LEFT JOIN orders o
+ON c.customer_id = o.customer_id
+GROUP BY c.name;`,
+
+              `SELECT c.name, COUNT(o.order_id) AS orders_count
+FROM customers c
+LEFT JOIN orders o
+ON c.customer_id = o.customer_id
+GROUP BY c.name
+HAVING COUNT(o.order_id) > 1;`,
+
+              `SELECT c.name, MAX(o.order_date) AS last_order
+FROM customers c
+LEFT JOIN orders o
+ON c.customer_id = o.customer_id
+GROUP BY c.name;`,
+
+              `SELECT c.name, AVG(o.total) AS avg_order
+FROM customers c
+LEFT JOIN orders o
+ON c.customer_id = o.customer_id
+GROUP BY c.name;`,
+
+              `SELECT c.name
+FROM customers c
+LEFT JOIN orders o
+ON c.customer_id = o.customer_id
+WHERE o.order_id IS NULL;`,
+
+              `SELECT c.name, o.order_id, oi.qty
+FROM customers c
+LEFT JOIN orders o ON c.customer_id = o.customer_id
+LEFT JOIN order_items oi ON o.order_id = oi.order_id;`,
+
+              `SELECT c.name, p.name, oi.qty
+FROM customers c
+LEFT JOIN orders o ON c.customer_id = o.customer_id
+LEFT JOIN order_items oi ON o.order_id = oi.order_id
+LEFT JOIN products p ON oi.product_id = p.product_id;`,
+
+              `SELECT p.name, SUM(oi.qty) AS total_qty
+FROM products p
+LEFT JOIN order_items oi ON p.product_id = oi.product_id
+GROUP BY p.name;`,
+
+              `SELECT DISTINCT c.name
+FROM customers c
+LEFT JOIN orders o ON c.customer_id = o.customer_id
+LEFT JOIN order_items oi ON o.order_id = oi.order_id
+LEFT JOIN products p ON oi.product_id = p.product_id
+WHERE p.category = 'Electronics';`
+            ],
+
+            questions: [
+              "Get all customers with their order IDs (include customers with no orders)",
+              "Show order totals with customer names (include NULLs for no orders)",
+              "Orders above 5000 (note: customers without orders will be excluded due to WHERE)",
+              "Only completed orders (note: behaves like INNER JOIN due to filtering)",
+              "Sort customers by order amount",
+              "Count orders per customer (including 0 orders)",
+              "Total spending per customer (NULL becomes 0 in understanding)",
+              "Customers with more than 1 order",
+              "Latest order date per customer",
+              "Average order value per customer",
+              "Find customers who have NOT placed any orders",
+              "Join 3 tables using LEFT JOIN",
+              "Product names with customer orders (including NULLs)",
+              "Total quantity ordered per product (including unsold products)",
+              "Customers who bought Electronics (LEFT JOIN + filter)"
+            ]
+        }
+      ]
+    },
+
+    15: {
+      title: "RIGHT",
+      highlight: "JOINs",
+      subtitle: "Keeping all right table rows — even when there is no match.",
+
+      points: [
+        "RIGHT JOIN returns ALL rows from the right table",
+        "Matching rows from the left table are included",
+        "If no match is found, NULL values are returned",
+        "In SQLite, RIGHT JOIN is not supported directly",
+        "We simulate RIGHT JOIN using LEFT JOIN by reversing table order"
+      ],
+
+      blocks: [
+        {
+          type: "noteBlue",
+          heading: "Think of it this way:",
+          explanation: "You want all orders, even if some customers are missing. RIGHT JOIN keeps all rows from the right table (orders). In SQLite, we achieve this by reversing the tables and using LEFT JOIN."
+        },
+      
+        {
+          type: "queryTable",
+          title: "15.1 - RIGHT JOIN (Simulated)",
+          subtitle: "Returns all orders, including those that may not have matching customers (simulated using LEFT JOIN).",
+          queryName: "SQL",
+          code: `SELECT o.order_id, c.name, o.total
+FROM orders o
+LEFT JOIN customers c
+ON c.customer_id = o.customer_id
+ORDER BY o.order_id;`,
+          data: dbTables.orders
+        },
+      
+        {
+          type: "queryTable",
+          title: "15.2 - RIGHT JOIN (Orders without Customers)",
+          subtitle: "Find orders that do NOT have matching customers using LEFT JOIN + IS NULL.",
+          queryName: "SQL",
+          code: `SELECT o.order_id
+FROM orders o
+LEFT JOIN customers c
+ON c.customer_id = o.customer_id
+WHERE c.customer_id IS NULL;`,
+          data: dbTables.orders
+        },
+      
+        {
+          type: "noteGreen",
+          heading: "Pro Tip:",
+          explanation: "RIGHT JOIN is rarely used in practice. Most developers prefer LEFT JOIN because it is more readable and widely supported."
+        },
+
+        {
+          type: "multipleTable",
+          data: [
+            {
+              title: "customers",
+              data: dbTables.customers
+            },
+            {
+              title: "orders",
+              data: dbTables.orders
+            }
+          ]
+        },
+
+        {
+          type: "exercise",
+          exersiceName: "Tables: Orders",
+          defaultQuery: "SELECT * FROM orders;",
+          tasks: [
+            `SELECT o.order_id, c.name
+FROM orders o
+LEFT JOIN customers c
+ON c.customer_id = o.customer_id;`,
+
+            `SELECT o.order_id, o.total
+FROM orders o
+LEFT JOIN customers c
+ON c.customer_id = o.customer_id;`,
+
+            `SELECT o.order_id, o.total
+FROM orders o
+LEFT JOIN customers c
+ON c.customer_id = o.customer_id
+WHERE o.total > 5000;`,
+
+            `SELECT o.order_id, c.name
+FROM orders o
+LEFT JOIN customers c
+ON c.customer_id = o.customer_id
+WHERE o.status = 'completed';`,
+
+            `SELECT o.order_id, o.total
+FROM orders o
+LEFT JOIN customers c
+ON c.customer_id = o.customer_id
+ORDER BY o.total DESC;`,
+
+            `SELECT o.order_id, COUNT(c.customer_id) AS match_count
+FROM orders o
+LEFT JOIN customers c
+ON c.customer_id = o.customer_id
+GROUP BY o.order_id;`,
+
+            `SELECT o.order_id, SUM(o.total) AS total_value
+FROM orders o
+LEFT JOIN customers c
+ON c.customer_id = o.customer_id
+GROUP BY o.order_id;`,
+
+            `SELECT o.order_id, COUNT(c.customer_id) AS count_match
+FROM orders o
+LEFT JOIN customers c
+ON c.customer_id = o.customer_id
+GROUP BY o.order_id
+HAVING COUNT(c.customer_id) > 0;`,
+
+            `SELECT o.order_id, MAX(o.order_date) AS latest
+FROM orders o
+LEFT JOIN customers c
+ON c.customer_id = o.customer_id
+GROUP BY o.order_id;`,
+
+            `SELECT o.order_id, AVG(o.total) AS avg_value
+FROM orders o
+LEFT JOIN customers c
+ON c.customer_id = o.customer_id
+GROUP BY o.order_id;`,
+
+            `SELECT o.order_id, oi.qty
+FROM orders o
+LEFT JOIN order_items oi ON o.order_id = oi.order_id;`,
+
+            `SELECT o.order_id, p.name
+FROM orders o
+LEFT JOIN order_items oi ON o.order_id = oi.order_id
+LEFT JOIN products p ON oi.product_id = p.product_id;`,
+
+            `SELECT p.name, COUNT(o.order_id)
+FROM products p
+LEFT JOIN order_items oi ON p.product_id = oi.product_id
+LEFT JOIN orders o ON oi.order_id = o.order_id
+GROUP BY p.name;`,
+
+            `SELECT DISTINCT o.order_id
+FROM orders o
+LEFT JOIN order_items oi ON o.order_id = oi.order_id
+LEFT JOIN products p ON oi.product_id = p.product_id
+WHERE p.category = 'Electronics';`
+          ],
+
+          questions: [
+           "Get all orders with customer names (include missing customers)",
+           "Show order totals with orders",
+           "Orders above 5000",
+           "Only completed orders",
+           "Sort orders by amount",
+           "Count matches per order",
+           "Total value per order",
+           "Orders with at least one matching customer",
+           "Latest date per order",
+           "Average value per order",
+           "Join orders with order_items",
+           "Get product names per order",
+           "Count orders per product",
+           "Orders that include Electronics products"
+         ]
+        }
+      ]     
+    },
+
+    16: {
+      title: "SELF",
+      highlight: "JOINs",
+      subtitle: "Joining a table to itself — useful for hierarchical relationships.",
+
+      points: [
+        "SELF JOIN is used to join a table with itself",
+        "Useful for hierarchical data (like employees and managers)",
+        "We use aliases to differentiate the same table",
+        "Each alias acts like a separate table",
+        "Common in real-world scenarios like org charts and reporting structure"
+      ],
+
+      blocks: [
+        {
+          type: "noteBlue",
+          heading: "Think of it this way:",
+          explanation: "Imagine an employees table where each employee has a manager_id. To find who manages whom, we join the employees table with itself — one side is the employee, the other is the manager."
+        },
+      
+        {
+          type: "queryTable",
+          title: "16.1 - SELF JOIN (Employee & Manager)",
+          subtitle: "Shows each employee along with their manager name.",
+          queryName: "SQL",
+          code: `SELECT e.name AS employee, m.name AS manager
+FROM employees e
+LEFT JOIN employees m
+ON e.manager_id = m.emp_id;`,
+          data: dbTables.employees
+        },
+      
+        {
+          type: "queryTable",
+          title: "16.2 - SELF JOIN",
+          subtitle: "A table joined to itself. Our employees table has manager_id referencing emp_id in the same table: ",
+          queryName: "Employees + their manager's name",
+          code: `SELECT e.name AS employee, m.name AS manager
+FROM employees e
+LEFT JOIN employees m ON e.manager_id = m.emp_id
+ORDER BY e.name;`,
+          data: dbTables.employees
+        },
+
+        {
+          type: "noteGreen",
+          heading: "Engineering Insight:",
+          explanation: "INNER JOIN vs LEFT JOIN is a decision, not a preference. Ask yourself: 'Is it valid for a row to have no match?' If yes, use LEFT JOIN. If a row must have a corresponding entry in the other table (by business rules), use INNER JOIN — it will surface data integrity issues."
+        },
+
+        {
+          type: "multipleTable",
+          data: [
+            {
+              title: "customers",
+              data: dbTables.customers
+            },
+            {
+              title: "orders",
+              data: dbTables.orders
+            }
+          ]
+        },
+      
+        {
+          type: "exercise",
+          exersiceName: "Tables: Employees",
+          defaultQuery: "SELECT * FROM employees;",
+
+          tasks: [
+            `SELECT e.name, m.name
+FROM employees e
+LEFT JOIN employees m
+ON e.manager_id = m.emp_id;`,
+
+          `SELECT e.name
+FROM employees e
+LEFT JOIN employees m
+ON e.manager_id = m.emp_id
+WHERE e.manager_id IS NULL;`,
+
+          `SELECT e.name, m.name
+FROM employees e
+LEFT JOIN employees m
+ON e.manager_id = m.emp_id
+WHERE m.name = 'Vikram';`,
+
+          `SELECT e.name, m.name
+FROM employees e
+LEFT JOIN employees m
+ON e.manager_id = m.emp_id
+ORDER BY m.name;`,
+
+          `SELECT m.name, COUNT(e.emp_id)
+FROM employees e
+LEFT JOIN employees m
+ON e.manager_id = m.emp_id
+GROUP BY m.name;`,
+
+          `SELECT m.name, SUM(e.salary)
+FROM employees e
+LEFT JOIN employees m
+ON e.manager_id = m.emp_id
+GROUP BY m.name;`,
+
+          `SELECT e.name, m.name
+FROM employees e
+LEFT JOIN employees m
+ON e.manager_id = m.emp_id
+WHERE e.salary > 70000;`,
+
+          `SELECT e.name, m.name
+FROM employees e
+LEFT JOIN employees m
+ON e.manager_id = m.emp_id
+WHERE e.department = 'IT';`,
+
+          `SELECT e.name, m.name
+FROM employees e
+LEFT JOIN employees m
+ON e.manager_id = m.emp_id
+WHERE m.department = 'Sales';`,
+
+          `SELECT e.name, m.name
+FROM employees e
+LEFT JOIN employees m
+ON e.manager_id = m.emp_id
+WHERE e.hire_date > '2021-01-01';`
+          ],
+
+          questions: [
+            "Get employee names with their managers",
+            "Find employees who do not have a manager",
+            "Find employees managed by Vikram",
+            "Sort employees by manager name",
+            "Count employees under each manager",
+            "Total salary under each manager",
+            "Employees with salary > 70000 and their managers",
+            "Employees from IT department with their managers",
+            "Employees whose managers are from Sales department",
+            "Employees hired after 2021 with their managers"
+          ]
+        }
+      ]
+    },
+
+    17: {
+      title: "UNION",
+      highlight: "SELECT",
+      subtitle: "Combining results from multiple queries into a single result set.",
+
+      points: [
+        "UNION is used to combine results of two or more SELECT queries",
+        "Each SELECT must have the same number of columns",
+        "Column data types must be compatible",
+        "UNION removes duplicate rows by default",
+        "Use UNION ALL to include duplicates"
+      ],
+
+      blocks: [
+        {
+          type: "noteBlue",
+          heading: "Think of it this way:",
+          explanation: "You have two lists — one of customers and one of employees. UNION merges them into a single list. It’s like stacking results on top of each other."
+        },
+      
+        {
+          type: "queryTable",
+          title: "17.1 - UNION",
+          subtitle: "Combine customer names and employee names into one list (duplicates removed).",
+          queryName: "SQL",
+          code: `SELECT name FROM customers
+UNION
+SELECT name FROM employees;`,
+          data: dbTables.customers
+        },
+      
+        {
+          type: "queryTable",
+          title: "17.2 - UNION ALL",
+          subtitle: "Combine results including duplicates.",
+          queryName: "SQL",
+          code: `SELECT name FROM customers
+UNION ALL
+SELECT name FROM employees;`,
+          data: dbTables.customers
+        },
+      
+        {
+          type: "noteGreen",
+          heading: "Pro Tip:",
+          explanation: "Use UNION when you want unique results. Use UNION ALL when performance matters and duplicates are allowed."
+        },
+      
+        {
+          type: "exercise",
+          exersiceName: "Tables: Customers & Employees",
+          defaultQuery: "SELECT * FROM customers;",
+    
+          tasks: [
+          `SELECT name FROM customers
+UNION
+SELECT name FROM employees;`,
+
+          `SELECT name FROM customers
+UNION ALL
+SELECT name FROM employees;`,
+
+          `SELECT city FROM customers
+UNION
+SELECT department FROM employees;`,
+
+          `SELECT country FROM customers
+UNION
+SELECT department FROM employees;`,
+
+          `SELECT name FROM customers
+WHERE country = 'India'
+UNION
+SELECT name FROM employees
+WHERE department = 'IT';`,
+
+          `SELECT name FROM customers
+UNION
+SELECT name FROM employees
+ORDER BY name;`,
+
+          `SELECT name FROM customers
+UNION ALL
+SELECT name FROM employees
+ORDER BY name;`,
+
+          `SELECT name FROM customers
+UNION
+SELECT name FROM customers;`,
+
+          `SELECT name FROM employees
+UNION
+SELECT name FROM employees;`,
+
+          `SELECT name FROM customers
+UNION ALL
+SELECT name FROM customers;`
+          ],
+        
+          questions: [
+            "Combine customer and employee names (unique values)",
+            "Combine customer and employee names (include duplicates)",
+            "Combine cities and departments",
+            "Combine countries and departments",
+            "Combine filtered results from two tables",
+            "Sort combined results",
+            "Sort combined results including duplicates",
+            "Remove duplicates from same table using UNION",
+            "Remove duplicates from employees",
+            "Keep duplicates using UNION ALL"
+          ]
+        }
+      ]
+    },
+
+    18: {
       title: "JOINing Three+",
       highlight: "Tables",
       subtitle: "Aggregating by category — the analytics workhorse.",
@@ -1038,7 +1720,7 @@ ORDER BY o.order_date, c.name;`,
       ]
     },
 
-    15: {
+    19: {
       title: "Subqueries",
       subtitle: "Queries within queries — nesting for power.",
 
@@ -1158,7 +1840,7 @@ WHERE price > (
       ]
     },
 
-    16: {
+    20: {
       title: "CTEs - The",
       highlight: "WITH Clause",
       subtitle: "Named subqueries that make complex logic readable.",
@@ -1275,7 +1957,7 @@ ORDER BY t.spent DESC;`,
       ]
     },
 
-    17: {
+    21: {
       title: "CASE",
       highlight: "Statements",
       subtitle: "If-else logic that lives inside your SQL.",
@@ -1349,7 +2031,7 @@ FROM employees;`,
       ]
     },
 
-    18: {
+    22: {
       title: "Window",
       highlight: "Functions",
       subtitle: "The feature that separates intermediate from advanced SQL.",
@@ -1497,7 +2179,7 @@ FROM orders;`,
       ]
     },
 
-    19: {
+    23: {
       title: "String",
       highlight: "Functions",
       subtitle: "Manipulating and transforming text data.",
@@ -1579,7 +2261,7 @@ FROM customers;`,
       ]
     },
 
-    20: {
+    24: {
       title: "Data & Time",
       highlight: "Functions",
       subtitle: "Working with dates - extraction, arithmetic, formatting.",
@@ -1649,7 +2331,7 @@ WHERE order_date >= DATE_SUB(CURDATE(), INTERVAL 90 DAY);`
       ]
     },
 
-    21: {
+    25: {
       title: "INSERT, UPDATE,",
       highlight: "DELETE",
       subtitle: "Modifying data — the right way, safely.",
@@ -1738,7 +2420,7 @@ DELETE FROM employees WHERE salary < 50000;          -- then delete`
       ]
     },
 
-    22: {
+    26: {
       title: "CREATE TABLE",
       highlight: "& DDL",
       subtitle: "Designing and modifying database structure.",
@@ -1793,7 +2475,7 @@ ALTER TABLE employees RENAME COLUMN department TO dept;`
       ]
     },
 
-    23: {
+    27: {
       title: "Indexes &",
       highlight: "Performance",
       subtitle: "The single most impactful performance tool available to you.",
@@ -1847,7 +2529,7 @@ EXPLAIN SELECT * FROM employees WHERE department = 'IT';`
       ]
     },
 
-    24: {
+    28: {
       title: "Transactions &",
       highlight: "ACID",
       subtitle: "Data integrity — guaranteeing your data is always correct.",
@@ -1892,7 +2574,7 @@ ROLLBACK; -- reverts both updates completely`
       ]
     },
 
-    25: {
+    29: {
       title: "SQL Execution",
       highlight: "Order",
       subtitle: "The secret that explains 80% of SQL errors.",
@@ -1957,7 +2639,7 @@ SELECT salary * 12 AS annual FROM employees ORDER BY annual DESC;`
       ]
     },
 
-    26: {
+    30: {
       title: "50 Practice",
       highlight: "Problems",
       subtitle: "Build real query muscle — from beginner to FAANG-ready.",
