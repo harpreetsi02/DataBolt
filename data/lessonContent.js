@@ -1124,7 +1124,12 @@ WHERE EXISTS (
           defaultQuery: "SELECT * FROM customers;",
 
           tasks: [
-            "SELECT name FROM customers WHERE customer_id IN (SELECT customer_id FROM orders);",
+            `SELECT name, price
+FROM products
+WHERE price > (
+    SELECT AVG(price)
+    FROM products
+);`,
           
             "SELECT name FROM customers WHERE customer_id NOT IN (SELECT customer_id FROM orders);",
           
@@ -1137,7 +1142,7 @@ WHERE EXISTS (
             "SELECT name FROM products WHERE price > (SELECT AVG(price) FROM products);"
           ],
           questions: [
-            "Find customers who have placed at least one order.",
+            "Get the name and price of products whose price is greater than the average price of all products.",
 
             "Find customers who have not placed any orders.",
 

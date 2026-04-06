@@ -1,29 +1,44 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { lessons } from "@/data/lessons";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const router = useRouter();
+  const timerRef = useRef(null);
+
+  const handleMouseEnter = () => {
+  // agar close hone wala tha → cancel
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+    setOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    timerRef.current = setTimeout(() => {
+      setOpen(false);
+    }, 2500); // 2.5 sec hold
+  };
 
   return (
     <div className="w-full backdrop-blur-md shadow-gray-800 shadow-md fixed top-0 left-0 z-50 bg-[#0f172a] text-white px-12 md:px-20 py-6 flex justify-between items-center border-b border-gray-800">
 
       {/* LEFT - LOGO */}
       <h1
-        className="text-4xl font-bold text-red-500 cursor-pointer"
+        className="text-4xl font-bold cursor-pointer"
         onClick={() => router.push("/")}
       >
-        DataBolt
+        Data<span className="text-red-500">Bolt</span>
       </h1>
 
       {/* RIGHT - CHAPTERS */}
       <div
         className="relative"
-        onMouseEnter={() => setOpen(true)}
-        onMouseLeave={() => setOpen(false)}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
       >
         <button className="px-4 text-xl py-2 rounded hover:text-red-500">
           Chapters ▼
