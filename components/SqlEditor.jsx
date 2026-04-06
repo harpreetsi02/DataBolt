@@ -174,7 +174,6 @@ export default function SqlEditor({ tasks = [], questions = [], lessonId, exerci
               <span className="w-6">{i + 1}.</span>
               {i < taskIndex && "✅"}
               {i === taskIndex && "👉"}
-              {/* {i > taskIndex && "•"} */}
 
               {q}
             </div>
