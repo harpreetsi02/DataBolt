@@ -163,7 +163,7 @@ export default function SqlEditor({ tasks = [], questions = [], lessonId, exerci
           {questions.map((q, i) => (
             <div
               key={i}
-              className={`p-2 text-sm flex gap-2 items-center  ${
+              className={`p-2 text-sm flex gap-2  ${
                 i === taskIndex
                   ? "text-blue-400"
                   : i < taskIndex
