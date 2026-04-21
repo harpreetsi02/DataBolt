@@ -4,19 +4,50 @@ import { useState, useEffect } from "react";
 import { getDB } from "@/lib/initDB";
 import { transformQuery } from "@/lib/sqlTransformer";
 
+function normalizeResult(result) {
+  if (!result.length) return [];
+
+  const { columns, values } = result[0];
+
+  return values.map((row) => {
+    const obj = {};
+    columns.forEach((col, i) => {
+      obj[col] = row[i];
+    });
+
+    // sort keys so order doesn't matter
+    return Object.keys(obj)
+      .sort()
+      .reduce((acc, key) => {
+        acc[key] = obj[key];
+        return acc;
+      }, {});
+  });
+}
+
+function compareResults(a, b) {
+  if (!a.length && !b.length) return true;
+  if (!a.length || !b.length) return false;
+
+  const normA = normalizeResult(a);
+  const normB = normalizeResult(b);
+
+  const sortedA = normA.sort((x, y) =>
+    JSON.stringify(x).localeCompare(JSON.stringify(y))
+  );
+
+  const sortedB = normB.sort((x, y) =>
+    JSON.stringify(x).localeCompare(JSON.stringify(y))
+  );
+
+  return JSON.stringify(sortedA) === JSON.stringify(sortedB);
+}
+
 export default function SqlEditor({ tasks = [], questions = [], lessonId, exerciseName, defaultQuery }) {
   const [query, setQuery] = useState("");
   const [result, setResult] = useState(null);
   const [taskIndex, setTaskIndex] = useState(0);
   const fallbackQuery = defaultQuery || "SELECT * FROM employees;";
-
-  const normalizeQuery = (q) => {
-    return q
-      .replace(/\s+/g, " ")
-      .replace(/\n/g, " ")
-      .trim()
-      .toLowerCase();
-  };
 
     const showSolution = () => {
             if (tasks[taskIndex]) {
@@ -30,53 +61,51 @@ export default function SqlEditor({ tasks = [], questions = [], lessonId, exerci
     setQuery(fallbackQuery);
     runQuery(fallbackQuery);
   }, [fallbackQuery]);
-
+  
   const runQuery = async (customQuery) => {
     const db = await getDB();
     const q = customQuery || query;
-    
+
+    // 🔒 block dangerous queries
+    const blocked = /(drop|alter|truncate)/i;
+    if (blocked.test(q)) {
+      setResult({
+        columns: ["Error"],
+        values: [["Dangerous query not allowed"]]
+      });
+      return;
+    }
+
+    // 🔒 allow only SELECT (for now)
+    if (!/^select/i.test(q.trim())) {
+      setResult({
+        columns: ["Error"],
+        values: [["Only SELECT queries allowed"]]
+      });
+      return;
+    }
+
     try {
       const transformed = transformQuery(q);
-    
-      const isMutation = /^(insert|update|delete)/i.test(q.trim());
-    
-      // 🔥 run main query
-      db.exec(transformed);
-    
-      if (isMutation) {
-        // show updated table
-        const res = db.exec("SELECT * FROM employees");
-      
 
-        if (res.length > 0) {
-          setResult(res[0]);
-        }
-      
-        // ✅ task check (simple match)
-        if (
-          tasks[taskIndex] &&
-          normalizeQuery(q) === normalizeQuery(tasks[taskIndex])
-        ) {
-          setTaskIndex(taskIndex + 1);
-        }
-      
-        return;
+      // ✅ run user query
+      const userResult = db.exec(transformed);
+
+      // ✅ show result
+      if (userResult.length > 0) {
+        setResult(userResult[0]);
       }
-    
-      // SELECT queries
-      const res = db.exec(transformed);
-    
-      if (res.length > 0) {
-        setResult(res[0]);
-      
-        if (
-          tasks[taskIndex] &&
-          normalizeQuery(q) === normalizeQuery(tasks[taskIndex])
-        ) {
-          setTaskIndex(taskIndex + 1);
+
+      // ✅ TASK VALIDATION (REAL FIX 🔥)
+      if (tasks[taskIndex]) {
+        const expectedQuery = tasks[taskIndex];
+        const expectedResult = db.exec(expectedQuery);
+
+        if (compareResults(userResult, expectedResult)) {
+          setTaskIndex((prev) => prev + 1);
         }
       }
-    
+
     } catch (err) {
       setResult({
         columns: ["Error"],
@@ -84,7 +113,7 @@ export default function SqlEditor({ tasks = [], questions = [], lessonId, exerci
       });
     }
   };
-  
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
 
@@ -155,7 +184,6 @@ export default function SqlEditor({ tasks = [], questions = [], lessonId, exerci
       </div>
 
       {/* RIGHT SIDE TASK PANEL */}
-      {/* <div className="p-4 bg-gray-900 rounded-xl"> */}
       <div className="p-4 flex flex-col justify-between bg-gray-900 rounded-xl h-full max-h-[calc(100vh-420px)] overflow-y-auto">
         <div>
           <h2 className="text-lg font-bold mb-3">Tasks</h2>

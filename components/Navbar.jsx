@@ -96,9 +96,9 @@ export default function Navbar() {
                 }}
                 className="text-red-500 hover:underline cursor-pointer text-sm"
               >
-                {l.id === 1
-                  ? "Introduction to SQL"
-                  : `SQL Lesson ${l.id - 1}: ${l.title}`}
+                {l.id <= 2
+                  ? `Intro Part ${l.id}: ${l.title}`
+                  : `Chapter ${l.id - 2}: ${l.title}`}
               </div>
             ))}
           </div>

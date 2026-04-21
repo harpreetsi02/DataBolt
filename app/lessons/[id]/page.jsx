@@ -19,7 +19,7 @@ export default async function LessonPage({ params }) {
         {/* CHAPTER TITLE */}
         <div className="max-w-4xl md:max-w-5xl relative bg-gray-900/60 border-t-4 rounded-xl border-red-500 p-4 mx-auto">
 
-            <p className="text-sm font-bold text-red-500 mb-2">CHAPTER {id}</p>
+            <p className="text-sm font-bold text-red-500 mb-2">{id <= 2 ? `INTRO ${id}` : `CHAPTER ${id - 2}`}</p>
 
             <h1 className="text-3xl md:text-5xl font-bold mb-2">
               {lesson.title} <span className="text-red-500">{lesson.highlight}</span>
