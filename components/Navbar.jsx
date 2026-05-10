@@ -87,7 +87,7 @@ export default function Navbar() {
           </h2>
 
           <div className="grid grid-cols-2 gap-x-6 gap-y-2">
-            {lessons.map((l) => (
+            {lessons.map((l) => ( 
               <div
                 key={l.id}
                 onClick={() => {

@@ -70,7 +70,7 @@ export default function Home() {
         >
           From "what is a database" to window functions and transactions.
         </p>
-      </section>
+      </section> 
 
       {/* CHAPTERS */}
       <section>
@@ -78,10 +78,9 @@ export default function Home() {
           {lessons.map((lesson) => (
             <Link key={lesson.id} href={`/lessons/${lesson.id}`}>
               <div className="bg-gray-900 border-l-4 border-red-500 hover:bg-gray-800 hover:scale-[1.02] transition p-3.5 rounded-xl shadow-lg shadow-black/30 cursor-pointer">
-                <span className="text-red-500 font-bold mr-2">
-                  {lesson.id.toString().padStart(2, "0")}
-                </span>
-                {lesson.title}
+                {lesson.id <= 2
+                  ? `Intro Part ${lesson.id}: ${lesson.title}`
+                  : `Chapter ${lesson.id - 2}: ${lesson.title}`}
               </div>
             </Link>
           ))}
