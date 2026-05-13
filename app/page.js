@@ -186,7 +186,10 @@ export default function Home() {
                   {/* top */}
                   <div className="flex justify-between items-start">
                     <span className="text-6xl font-black text-white/10">
-                      {lesson.id}
+                      {/* {lesson.id} */}
+                      {lesson.id <= 2
+                              ? `Intro Part ${lesson.id}: ${lesson.title}`
+                              : `Chapter ${lesson.id - 2}: ${lesson.title}`}
                     </span>
 
                     <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-red-500 transition">

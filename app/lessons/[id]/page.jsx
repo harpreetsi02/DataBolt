@@ -37,7 +37,7 @@ export default async function LessonPage({ params }) {
 
           {/* HUGE BG NUMBER */}
           <h1 className="absolute top-0 right-5 text-[140px] md:text-[240px] font-black text-white/3 leading-none select-none">
-            {id}
+              {id <= 2 ? `${id}` : `${id - 2}`}
           </h1>
 
           {/* BADGE */}
