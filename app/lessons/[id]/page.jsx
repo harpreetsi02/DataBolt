@@ -1,298 +1,361 @@
-import { lessons } from "@/data/lessons";
 import { lessonContent } from "@/data/lessonContent";
 import SqlEditor from "@/components/SqlEditor";
 import NextLessonButton from "@/components/NextLessonButton";
 import QueryTable from "@/components/QueryTable";
+import "remixicon/fonts/remixicon.css";
 
 export default async function LessonPage({ params }) {
+
   const { id } = await params;
 
   const lesson = lessonContent[id];
 
   if (!lesson) {
-    return <div className="text-white p-10">Lesson not found</div>;
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center text-3xl">
+        Lesson not found
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-black text-white px-4 md:px-10 py-10">
+    <div className="relative min-h-screen overflow-hidden bg-[#050505] text-white py-32 px-4 md:px-10">
 
-        {/* CHAPTER TITLE */}
-        <div className="max-w-4xl md:max-w-5xl relative bg-gray-900/60 border-t-4 rounded-xl border-red-500 p-4 mx-auto">
+      {/* GRID */}
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-size-[70px_70px]" />
 
-            <p className="text-sm font-bold text-red-500 mb-2">{id <= 2 ? `INTRO ${id}` : `CHAPTER ${id - 2}`}</p>
+      {/* GLOW */}
+      <div className="absolute top-0 left-0 w-125 h-125 bg-red-500/10 rounded-full blur-[140px]" />
 
-            <h1 className="text-3xl md:text-5xl font-bold mb-2">
-              {lesson.title} <span className="text-red-500">{lesson.highlight}</span>
-            </h1>
+      <div className="absolute bottom-0 right-0 w-125 h-125 bg-red-700/10 rounded-full blur-[140px]" />
 
-            <p className="text-gray-500 mb-6">
-              {lesson.subtitle}
-            </p>
+      {/* MAIN */}
+      <div className="relative z-10 max-w-6xl mx-auto overflow-hidden rounded-[40px] border border-white/10 bg-white/3 backdrop-blur-3xl shadow-[0_20px_80px_rgba(0,0,0,0.6)]">
 
-            {/* IN THIS CHAPTER */}
-            <div className="mb-8">
-              <h3 className="font-semibold text-red-500 mb-2 border-b pb-2">
-                IN THIS CHAPTER
+        {/* HERO */}
+        <div className="relative overflow-hidden border-b border-white/5 p-8 md:p-14">
+
+          {/* HUGE BG NUMBER */}
+          <h1 className="absolute top-0 right-5 text-[140px] md:text-[240px] font-black text-white/3 leading-none select-none">
+            {id}
+          </h1>
+
+          {/* BADGE */}
+          <div className="inline-flex items-center gap-3 rounded-full border border-red-500/20 bg-red-500/10 px-4 py-2 mb-8">
+
+            <div className="w-2 h-2 rounded-full bg-red-500"></div>
+
+            <span className="text-sm tracking-widest text-red-400">
+              {id <= 2 ? `INTRO ${id}` : `CHAPTER ${id - 2}`}
+            </span>
+          </div>
+
+          {/* TITLE */}
+          <h1 className="max-w-4xl text-4xl md:text-7xl font-black leading-tight tracking-tight">
+
+            {lesson.title}{" "}
+
+            <span className="text-red-500">
+              {lesson.highlight}
+            </span>
+          </h1>
+
+          {/* SUBTITLE */}
+          <p className="mt-8 max-w-3xl text-lg leading-relaxed text-zinc-400">
+            {lesson.subtitle}
+          </p>
+
+          {/* STATS */}
+          <div className="flex flex-wrap gap-4 mt-10">
+
+            <div className="rounded-2xl border border-white/10 bg-white/3 px-5 py-4">
+              <h3 className="text-2xl font-bold">
+                {lesson.blocks.length}
               </h3>
 
-              <ul className="list-disc border-b border-red-500 pb-5 pl-5 space-y-1 text-gray-300">
-                {lesson.points.map((point, i) => (
-                  <li key={i}>{point}</li>
-                ))}
-              </ul>
+              <p className="text-sm text-zinc-500">
+                Learning Blocks
+              </p>
             </div>
 
-            {/* SECTION */}
-            {lesson.blocks.map((block, i) => {
-                if (block.type === "query") {
-                    return (
-                        <div key={i} className="mb-8">
-                            <h2 className="text-xl font-semibold text-red-500 mb-3">
-                              {block.heading}
-                            </h2>
+            <div className="rounded-2xl border border-white/10 bg-white/3 px-5 py-4">
+              <h3 className="text-2xl font-bold">
+                SQL
+              </h3>
 
-                            <p className="text-gray-300 mb-4">
-                              {block.subtitle}
-                            </p>
-
-                            <p className="text-red-500 flex items-center gap-2">
-                              <i className="ri-send-plane-2-fill"></i>
-                              {block.queryName}
-                            </p>
-
-                            {/* CODE BLOCK */}
-                            <div className="bg-gray-900 text-gray-400 p-4 rounded-lg overflow-x-auto text-sm">
-                                <pre>
-                                    {block.code}
-                                </pre>
-                            </div>
-
-                            <p className="text-gray-300 mt-4">
-                              {block.explanation}
-                            </p>
-                        </div>
-                    );
-                }
-
-                if (block.type === "queryTable") {
-                  return (
-                    <div key={i} className="mb-8">
-                      <h2 className="text-xl font-semibold text-red-500 mb-3">
-                        {block.title}
-                      </h2>
-                
-                      <p className="text-gray-300 mb-4">
-                        {block.subtitle}
-                      </p>
-                
-                      <p className="text-red-500 flex items-center gap-2">
-                        <i className="ri-send-plane-2-fill"></i>
-                        {block.queryName}
-                      </p>
-                
-                      {/* CODE */}
-                      <div className="bg-gray-900 md:w-4/5 ml-5 mb-10 text-gray-400 p-4 rounded-lg overflow-x-auto text-sm">
-                        <pre>{block.code}</pre>
-                      </div>
-                
-                      {/* ✅ RESULT TABLE */}
-                      <QueryTable query={block.code} />
-                    </div>
-                  );
-                }
-
-                // TABLE
-                if (block.type === "table") {
-                    return (
-                        <div key={i} className="mb-8">
-                          <h2 className="text-xl font-semibold text-red-500 mb-3">
-                            <i className="ri-git-repository-line p-2"></i>Table: {block.title}
-                          </h2>
-                        
-                          <div className="overflow-x-auto">
-                            <table className="w-full text-sm whitespace-nowrap">
-                              <thead className="bg-gray-300 text-gray-800">
-                                <tr className="py-10">
-                                  {block.data.headers.map((h, j) => (
-                                    <th key={j} className="p-2.5 border">{h}</th>
-                                  ))}
-                                </tr>
-                              </thead>
-                              
-                              <tbody>
-                                {block.data.rows.map((row, j) => (
-                                  <tr key={j} className="odd:bg-gray-800">
-                                    {row.map((cell, k) => (
-                                      <td key={k} className="px-2.5 py-2 border">{cell}</td>
-                                    ))}
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
-                          </div>
-                        </div>
-                    );
-                }
-
-                if (block.type === "summaryTable") {
-                    return (
-                        <div key={i} className="mb-8">
-                          <h2 className="text-xl font-semibold text-red-500 mb-3">
-                            {block.title}
-                          </h2>
-
-                          <p className="text-gray-300 mb-4">
-                            {block.subtitle}
-                          </p>
-                          
-                          <p className="text-red-500 flex items-center gap-2">
-                            <i className="ri-send-plane-2-fill"></i>
-                            {block.queryName}
-                          </p>
-                        
-                          <div className="overflow-x-auto">
-                            <table className="w-full text-sm whitespace-nowrap">
-                              <thead className="bg-gray-300 text-gray-800">
-                                <tr className="py-10">
-                                  {block.headers.map((h, j) => (
-                                    <th key={j} className="p-2.5 border">{h}</th>
-                                  ))}
-                                </tr>
-                              </thead>
-                              
-                              <tbody>
-                                {block.rows.map((row, j) => (
-                                  <tr key={j} className="odd:bg-gray-800 text-center">
-                                    {row.map((cell, k) => (
-                                      <td key={k} className="px-2.5 py-2 border">{cell}</td>
-                                    ))}
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
-                          </div>
-                        </div>
-                    );
-                }
-
-                if (block.type === "exercise") {
-                    return (
-                        <div key={i} className="mt-6">
-                            <h2 className="text-xl absolute right-5 font-bold top-5 text-red-500">Exercise 👇</h2>
-
-                            <h3 className="font-bold mb-2 text-xl text-red-500">
-                                Exercise:
-                            </h3>
-
-                            <SqlEditor
-                                exerciseName={block.exersiceName}
-                                tasks={block.tasks}
-                                questions={block.questions}
-                                lessonId={id}
-                                defaultQuery={block.defaultQuery}
-                            />
-                        
-                        </div>
-                    );
-                }
-
-                if (block.type === "multipleTable") {           
-                  const tables = Array.isArray(block.data)
-                    ? block.data
-                    : [{ title: block.title, data: block.data }];
-
-                  return (
-                    <div key={i} className="my-10 overflow-hidden bg-gray-900 rounded-xl">
-                        <h2 className="text-center bg-red-500 text-white text-2xl font-bold py-3">Included Tables in Exercise</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 p-4 gap-6">
-                      {tables.map((table, idx) => (
-                        <div className="" key={idx}>
-                        
-                          <h2 className="text-xl font-semibold text-green-500 mb-3">
-                            <i className="ri-git-repository-line p-2"></i>
-                            Table: {table.title}
-                          </h2>
-                    
-                          <div className="overflow-x-auto">
-                            <table className="w-full text-sm whitespace-nowrap">
-                    
-                              <thead className="bg-green-300 text-gray-800">
-                                <tr>
-                                  {table.data.headers.map((h, j) => (
-                                    <th key={j} className="p-2.5 border">{h}</th>
-                                  ))}
-                                </tr>
-                              </thead>
-                              
-                              <tbody>
-                                {table.data.rows.map((row, j) => (
-                                  <tr key={j} className="odd:bg-green-400/10">
-                                    {row.map((cell, k) => (
-                                      <td key={k} className="px-2.5 py-2 border">
-                                        {cell === null ? "NULL" : cell}
-                                      </td>
-                                    ))}
-                                  </tr>
-                                ))}
-                              </tbody>
-                            
-                            </table>
-                          </div>
-                            
-                        </div>
-                      ))}
-                    </div>
-                    </div>
-                  );
-                }
-
-                if (block.type === "noteGreen") {
-                  return (
-                    <div key={i} className="bg-green-100 border-l-4 mb-5 border-green-600 p-4 rounded">
-                        <p className="text-sm text-green-800">
-                        ✅ <span className="font-bold text-green-900">{block.heading}</span> {block.explanation}
-                        </p>
-                    </div>
-                  );
-                }
-
-                if (block.type === "noteBlue") {
-                  return (
-                    <div key={i}>
-                      <p className="text-gray-300 mb-4">
-                          {block.subtitle}
-                      </p>
-                      <div className="bg-blue-100 border-l-4 mb-5 border-blue-600 p-4 rounded">
-                        <p className="text-sm text-blue-800">
-                        🌟 <span className="font-bold text-blue-900">{block.heading}</span> {block.explanation}
-                        </p>
-                      </div>
-                    </div>
-                  );
-                }
-
-                if (block.type === "noteRed") {
-                  return (
-                    <div key={i} className="bg-red-100 border-l-4 mb-5 border-red-600 p-4 rounded">
-                        <p className="text-sm text-red-800">
-                        ❌ <span className="font-bold text-red-900">{block.heading}</span> {block.explanation}
-                        </p>
-                    </div>
-                  );
-                }
-
-                if (block.type === "note") {
-                  return (
-                    <div key={i} className="bg-yellow-100 border-l-4 mb-5 border-yellow-600 p-4 rounded">
-                        <p className="text-sm text-yellow-800">
-                        💡 <span className="font-bold text-yellow-900">{block.heading}</span> {block.explanation}
-                        </p>
-                    </div>
-                  );
-                }
-            })}    
+              <p className="text-sm text-zinc-500">
+                Interactive Queries
+              </p>
+            </div>
+          </div>
         </div>
+
+        {/* IN THIS CHAPTER */}
+        <div className="border-b border-white/5 p-8 md:p-14">
+          <div className="flex items-center gap-4 mb-10">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-red-500">
+              <i className="ri-book-open-line text-2xl"></i>
+            </div>
+
+            <div>
+              <h2 className="text-3xl font-black">
+                In This Chapter
+              </h2>
+
+              <p className="text-zinc-500">
+                Concepts you'll master
+              </p>
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            {lesson.points.map((point, i) => (
+              <div
+                key={i}
+                className="flex gap-4 rounded-2xl border border-white/5 bg-white/2 p-5"
+              >
+                <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-red-500/20 text-red-400 font-bold">
+                  {i + 1}
+                </div>
+
+                <p className="text-zinc-300">
+                  {point}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* CONTENT */}
+        <div className="p-8 md:p-14">
+          {lesson.blocks.map((block, i) => {
+            // QUERY BLOCK
+            if (block.type === "query") {
+              return (
+                <div key={i} className="mb-20">
+
+                  <h2 className="text-3xl font-black tracking-tight mb-5">
+                    {block.heading}
+                  </h2>
+
+                  <p className="text-zinc-400 text-lg leading-relaxed mb-6">
+                    {block.subtitle}
+                  </p>
+
+                  {/* QUERY NAME */}
+                  <div className="inline-flex items-center gap-3 rounded-full border border-red-500/20 bg-red-500/10 px-4 py-2 text-red-400 mb-6">
+
+                    <i className="ri-terminal-box-line"></i>
+
+                    {block.queryName}
+                  </div>
+
+                  {/* CODE BLOCK */}
+                  <div className="overflow-hidden rounded-3xl border border-white/10 bg-[#0b0b0b]">
+
+                    {/* TOP BAR */}
+                    <div className="flex items-center gap-2 border-b border-white/5 bg-white/2 px-5 py-4">
+                      <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                      <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                      <span className="ml-4 text-xs tracking-widest text-zinc-500">
+                        SQL QUERY
+                      </span>
+                    </div>
+
+                    <pre className="overflow-x-auto p-6 text-sm text-zinc-300">
+                      {block.code}
+                    </pre>
+                  </div>
+
+                  <p className="mt-6 text-lg leading-relaxed text-zinc-400">
+                    {block.explanation}
+                  </p>
+                </div>
+              );
+            }
+
+            // QUERY TABLE
+            if (block.type === "queryTable") {
+              return (
+                <div key={i} className="mb-20">
+                  <h2 className="text-3xl font-black tracking-tight mb-5">
+                    {block.title}
+                  </h2>
+
+                  <p className="text-zinc-400 text-lg leading-relaxed mb-6">
+                    {block.subtitle}
+                  </p>
+
+                  {/* CODE */}
+                  <div className="overflow-hidden rounded-3xl border border-white/10 bg-[#0b0b0b] mb-10">
+
+                    <div className="flex items-center gap-2 border-b border-white/5 bg-white/2 px-5 py-4">
+                      <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                      <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                      <span className="ml-4 text-xs tracking-widest text-zinc-500">
+                        SQL QUERY
+                      </span>
+                    </div>
+
+                    <pre className="overflow-x-auto p-6 text-sm text-zinc-300">
+                      {block.code}
+                    </pre>
+                  </div>
+                  <QueryTable query={block.code} />
+                </div>
+              );
+            }
+
+            // TABLE
+            if (block.type === "table") {
+              return (
+                <div key={i} className="mb-20">
+                  <h2 className="text-3xl font-black tracking-tight mb-8">
+                    {block.title}
+                  </h2>
+                  <div className="overflow-hidden rounded-3xl border border-white/10">
+                    <table className="w-full text-sm">
+                      <thead className="bg-white/5 text-zinc-300">
+                        <tr>
+                          {block.data.headers.map((h, j) => (
+                            <th
+                              key={j}
+                              className="border-b border-white/5 p-5 text-left"
+                            >
+                              {h}
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+
+                      <tbody>
+                        {block.data.rows.map((row, j) => (
+                          <tr
+                            key={j}
+                            className="border-b border-white/5 odd:bg-white/2 hover:bg-red-500/2 transition"
+                          >
+
+                            {row.map((cell, k) => (
+                              <td
+                                key={k}
+                                className="p-5 text-zinc-300"
+                              >
+                                {cell}
+                              </td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              );
+            }
+
+            // EXERCISE
+            if (block.type === "exercise") {
+              return (
+                <div
+                  key={i}
+                  className="mt-20 rounded-4xl border border-red-500/20 bg-red-500/3 p-8 md:p-10"
+                >
+
+                  <div className="flex items-center gap-4 mb-10">
+
+                    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-red-500">
+                      <i className="ri-code-box-line text-2xl"></i>
+                    </div>
+
+                    <div>
+                      <h2 className="text-3xl font-black">
+                        Exercise
+                      </h2>
+
+                      <p className="text-zinc-500">
+                        Practice your SQL skills
+                      </p>
+                    </div>
+                  </div>
+
+                  <SqlEditor
+                    exerciseName={block.exersiceName}
+                    tasks={block.tasks}
+                    questions={block.questions}
+                    lessonId={id}
+                    defaultQuery={block.defaultQuery}
+                  />
+                </div>
+              );
+            }
+
+            // NOTES
+            if (block.type === "note") {
+              return (
+                <div
+                  key={i}
+                  className="mb-8 rounded-2xl border border-yellow-500/20 bg-yellow-500/5 p-5"
+                >
+                  <p className="text-yellow-200">
+                    💡 <span className="font-bold">{block.heading}</span>{" "}
+                    {block.explanation}
+                  </p>
+                </div>
+              );
+            }
+
+            if (block.type === "noteGreen") {
+              return (
+                <div
+                  key={i}
+                  className="mb-8 rounded-2xl border border-green-500/20 bg-green-500/5 p-5"
+                >
+                  <p className="text-green-200">
+                    ✅ <span className="font-bold">{block.heading}</span>{" "}
+                    {block.explanation}
+                  </p>
+                </div>
+              );
+            }
+
+            if (block.type === "noteBlue") {
+              return (
+                <div
+                  key={i}
+                  className="mb-8 rounded-2xl border border-blue-500/20 bg-blue-500/5 p-5"
+                >
+                  <p className="text-blue-200">
+                    🌟 <span className="font-bold">{block.heading}</span>{" "}
+                    {block.explanation}
+                  </p>
+                </div>
+              );
+            }
+
+            if (block.type === "noteRed") {
+              return (
+                <div
+                  key={i}
+                  className="mb-8 rounded-2xl border border-red-500/20 bg-red-500/5 p-5"
+                >
+                  <p className="text-red-200">
+                    ❌ <span className="font-bold">{block.heading}</span>{" "}
+                    {block.explanation}
+                  </p>
+                </div>
+              );
+            }
+
+            return null;
+          })}
+        </div>
+      </div>
+
+      {/* NEXT BUTTON */}
+      <div className="relative z-10">
         <NextLessonButton currentId={id} lesson={lesson} />
+      </div>
     </div>
   );
 }
